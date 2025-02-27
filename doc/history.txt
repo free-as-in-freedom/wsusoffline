@@ -1893,3 +1893,4 @@ Community Edition 12.7 -- ??.??.????
 - Fix: Microsoft Edge 100 (and newer) fail to install with error code 109, if the wsusoffline media is read only (Thanks to "jmcaree" and "Charles Waters")
 - Fix: wsusou will now install .NET 4.6.2 instead of 4.8 on Windows 10 1507 LTSB (Thanks to "aker")
 - Fix: simplify AddCustomLanguageSupport.cmd to decrease error rate (Thanks to "han lunes" and "hbuhrmester")
+- Fix: Restart "TrustedInstaller" after updating Servicing Stack to prevent updtae failures at reboot in rare situations (Thanks to "aker")

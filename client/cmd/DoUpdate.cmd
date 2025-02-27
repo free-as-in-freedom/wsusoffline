@@ -31,7 +31,7 @@ if "%DIRCMD%" NEQ "" set DIRCMD=
 
 cd /D "%~dp0"
 
-set WSUSOFFLINE_VERSION=12.7 (b81)
+set WSUSOFFLINE_VERSION=12.7 (b82)
 title %~n0 %*
 echo Starting WSUS Offline Update - Community Edition - v. %WSUSOFFLINE_VERSION% at %TIME%...
 set UPDATE_LOGFILE=%SystemRoot%\wsusofflineupdate.log
@@ -534,6 +534,11 @@ if "%ERR_LEVEL%"=="3010" (
 ) else if "%ERR_LEVEL%" NEQ "0" (
   goto SkipServicingStack
 )
+echo Restarting service 'Windows Modules Installer' (TrustedInstaller)...
+call :WaitService TrustedInstaller Stopped 180
+if not errorlevel 1 (call :Log "Info: Stopped service 'Windows Modules Installer' (TrustedInstaller)") else (set REBOOT_REQUIRED=1)
+call :WaitService TrustedInstaller Running 60
+if not errorlevel 1 (call :Log "Info: Started service 'Windows Modules Installer' (TrustedInstaller)") else (set REBOOT_REQUIRED=1)
 call :Log "Info: Updated Servicing Stack to %SERVICING_VER_NEW%"
 set SERVICING_VER=%SERVICING_VER_NEW%
 goto CheckServicingStack
@@ -1950,8 +1955,17 @@ for /f "delims=" %%f in ('dir /b "%TEMP%\wou_SSU\SSU*.cab"') do (
   ) else if "!ERR_LEVEL!" NEQ "0" (
     goto InstError
   )
+  rem call :WaitService TrustedInstaller Stopped 180
+  rem call :WaitService TrustedInstaller Running 60
 )
 rd /s /q "%TEMP%\wou_SSU" >nul 2>&1
+
+echo Restarting service 'Windows Modules Installer' (TrustedInstaller)...
+call :WaitService TrustedInstaller Stopped 180
+if not errorlevel 1 (call :Log "Info: Stopped service 'Windows Modules Installer' (TrustedInstaller)") else (set REBOOT_REQUIRED=1)
+call :WaitService TrustedInstaller Running 60
+if not errorlevel 1 (call :Log "Info: Started service 'Windows Modules Installer' (TrustedInstaller)") else (set REBOOT_REQUIRED=1)
+
 if "%RECALL_REQUIRED%"=="1" (
   rem del "%TEMP%\UpdatesToInstall.txt"
   move /Y "%TEMP%\UpdatesToInstall.txt" %SystemRoot%\Temp\WOUpdatesToInstall.txt >nul 2>&1
