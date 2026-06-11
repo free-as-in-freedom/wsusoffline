@@ -208,6 +208,8 @@ w100_keys=(
                  "20348_x64"
                  "22000_x64"
                  "22621_x64"
+                 "22631_x64"
+                 "26100_x64"
 )
 
 declare -A w100_labels=(
@@ -222,6 +224,8 @@ declare -A w100_labels=(
     [20348_x64]="Windows Server 2022"
     [22000_x64]="Windows 11, version 21H2"
     [22621_x64]="Windows 11, version 22H2"
+    [22631_x64]="Windows 11, version 23H2"
+    [26100_x64]="Windows 11, version 24H2"
 )
 
 declare -A w100_values=(
@@ -232,6 +236,8 @@ declare -A w100_values=(
                        [20348_x64]="on"
                        [22000_x64]="on"
                        [22621_x64]="on"
+                       [22631_x64]="on"
+                       [26100_x64]="on"
 )
 
 download_parameters=()

@@ -1185,7 +1185,7 @@ for /F "usebackq tokens=2 delims=," %%j in ("%TEMP%\DynamicDownloadLinks-msedge.
 
 if "%NEED_TO_DOWNLOAD_EDGE%"=="1" goto DownloadMSEdge
 
-rem Alles unverändert
+rem Alles unverï¿½ndert
 
 call :Log "Info: Downloaded/validated Microsoft Edge (Chromium) installation files"
 del "%TEMP%\DynamicDownloadLinks-msedge.txt"
@@ -1359,7 +1359,7 @@ if "%TMP_PLATFORM:~-4%"=="-x64" (
 
 if "%TMP_PLATFORM%"=="w100" (
   set TMP_BUILDS_ALL_WIN10=10240 14393 17763 19041 20348
-  set TMP_BUILDS_ALL_WIN11=22000 22621
+  set TMP_BUILDS_ALL_WIN11=22000 22621 22631 26100
   set TMP_BUILDS_ALL_CURRENT=
   set TMP_BUILDS_LINE=
 
