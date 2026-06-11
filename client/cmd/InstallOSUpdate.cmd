@@ -112,6 +112,12 @@ echo Verifying integrity of %FILE_FULL_PATH_DISPLAY%...
 rem FIXME: This expects a relative path and might fail, when an absolute path is passed
 for /F "tokens=2,3 delims=\" %%i in ("%FILE_FULL_PATH_DISPLAY%") do (
   if exist ..\md\hashes-%%i-%%j.txt (
+    %SystemRoot%\System32\findstr.exe /L /I /C:%FILE_NAME% ..\md\hashes-%%i-%%j.txt >nul 2>&1
+    if errorlevel 1 (
+      echo Warning: No hash entry found for %FILE_NAME% in hashes-%%i-%%j.txt - skipping verification.
+      echo %DATE% %TIME% - Warning: No hash entry found for %FILE_NAME% in hashes-%%i-%%j.txt>>%UPDATE_LOGFILE%
+      goto SkipVerification
+    )
     %SystemRoot%\System32\findstr.exe /L /I /C:%% /C:%FILE_NAME% ..\md\hashes-%%i-%%j.txt >"%TEMP%\hash-%%i-%%j.txt"
     %HASHDEEP_PATH% -a -b -k "%TEMP%\hash-%%i-%%j.txt" "%FILE_FULL_PATH%"
     if errorlevel 1 (
@@ -122,6 +128,12 @@ for /F "tokens=2,3 delims=\" %%i in ("%FILE_FULL_PATH_DISPLAY%") do (
     goto SkipVerification
   )
   if exist ..\md\hashes-%%i.txt (
+    %SystemRoot%\System32\findstr.exe /L /I /C:%FILE_NAME% ..\md\hashes-%%i.txt >nul 2>&1
+    if errorlevel 1 (
+      echo Warning: No hash entry found for %FILE_NAME% in hashes-%%i.txt - skipping verification.
+      echo %DATE% %TIME% - Warning: No hash entry found for %FILE_NAME% in hashes-%%i.txt>>%UPDATE_LOGFILE%
+      goto SkipVerification
+    )
     %SystemRoot%\System32\findstr.exe /L /I /C:%% /C:%FILE_NAME% ..\md\hashes-%%i.txt >"%TEMP%\hash-%%i.txt"
     %HASHDEEP_PATH% -a -b -k "%TEMP%\hash-%%i.txt" "%FILE_FULL_PATH%"
     if errorlevel 1 (
