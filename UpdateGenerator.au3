@@ -28,10 +28,10 @@ Dim Const $win10_displayversions        = "1507,1607,1809,2004/20H2/21H1/21H2/22
 Dim Const $win10_displayversions_x86    = ",,,,"
 Dim Const $win10_displayversions_x64    = ",Server 2016,Server 2019,,Server 2022"
 Dim Const $win10_defaults               = "Disabled,Enabled,Enabled,Enabled,Enabled"
-Dim Const $win11_vmax                   = 4
-Dim Const $win11_versions               = "22000,22621,22631,26100"
-Dim Const $win11_displayversions        = "21H2,22H2,23H2,24H2"
-Dim Const $win11_defaults               = "Enabled,Enabled,Enabled,Enabled"
+Dim Const $win11_vmax                   = 5
+Dim Const $win11_versions               = "22000,22621,22631,26100,26200"
+Dim Const $win11_displayversions        = "21H2,22H2,23H2,24H2,25H2"
+Dim Const $win11_defaults               = "Enabled,Enabled,Enabled,Enabled,Enabled"
 
 ; Registry constants
 Dim Const $reg_key_hkcu_desktop         = "HKEY_CURRENT_USER\Control Panel\Desktop"
