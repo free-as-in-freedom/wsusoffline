@@ -105,6 +105,8 @@ Dim Const $path_rel_w100_19045_x86      = "\w100\glb\windows10.0-kb5015684-x86*.
 Dim Const $path_rel_w100_19045_x64      = "\w100-x64\glb\windows10.0-kb5015684-x64*.*"
 Dim Const $path_rel_w100_19045_x86_sub  = "\w100\glb\19041\windows10.0-kb5015684-x86*.*"
 Dim Const $path_rel_w100_19045_x64_sub  = "\w100-x64\glb\19041\windows10.0-kb5015684-x64*.*"
+Dim Const $path_rel_w100_26200_x64      = "\w100-x64\glb\windows11.0-kb5054156-x64*.*"
+Dim Const $path_rel_w100_26200_x64_sub  = "\w100-x64\glb\26100\windows11.0-kb5054156-x64*.*"
 Dim Const $path_rel_msi_all             = "\wouallmsi.txt"
 Dim Const $path_rel_msi_selected        = "\Temp\wouselmsi.txt"
 
@@ -288,7 +290,16 @@ Func BuildUpgradeAvailable($basepath, $enforcementmode)
 	      Return 0
       EndSwitch
 	Case "WIN_11"
-      Return 0
+      Switch @OSBuild
+	    Case "26100"
+          If (@OSArch <> "X86") Then
+            Return ( (FileExists($basepath & $path_rel_w100_26200_x64)) OR (FileExists($basepath & $path_rel_w100_26200_x64_sub)) )
+          Else
+            Return 0
+          EndIf
+	    Case Else
+	      Return 0
+      EndSwitch
 	Case Else
       Return 0
   EndSwitch
@@ -560,7 +571,7 @@ $scriptdir = AssignScriptDirectory()
 $txtxpos = $txtxoffset
 $txtypos = $txtyoffset
 If $gergui Then
-  GUICtrlCreateLabel("Wählen Sie die gewünschten Optionen und klicken Sie auf 'Start'," & @LF & "um die fehlenden Microsoft-Updates auf Ihrem System zu installieren.", $txtxpos, $txtypos, 3 * $groupwidth / 4, 1.5 * $txtheight)
+  GUICtrlCreateLabel("Wï¿½hlen Sie die gewï¿½nschten Optionen und klicken Sie auf 'Start'," & @LF & "um die fehlenden Microsoft-Updates auf Ihrem System zu installieren.", $txtxpos, $txtypos, 3 * $groupwidth / 4, 1.5 * $txtheight)
 Else
   GUICtrlCreateLabel("Select desired options and click 'Start'" & @LF & "to install missing Microsoft updates on your computer.", $txtxpos, $txtypos, 3 * $groupwidth / 4, 1.5 * $txtheight)
 EndIf
@@ -601,7 +612,7 @@ GUICtrlCreateGroup("Installation", $txtxpos, $txtypos, $groupwidth, 5 * $txtheig
 $txtxpos = 3 * $txtxoffset
 $txtypos = $txtypos + 1.5 * $txtyoffset
 If $gergui Then
-  $buildupgrade = GUICtrlCreateCheckbox("Feature Update über Enablement Package", $txtxpos, $txtypos, $txtwidth, $txtheight)
+  $buildupgrade = GUICtrlCreateCheckbox("Feature Update ï¿½ber Enablement Package", $txtxpos, $txtypos, $txtwidth, $txtheight)
 Else
   $buildupgrade = GUICtrlCreateCheckbox("Feature Update via Enablement Package", $txtxpos, $txtypos, $txtwidth, $txtheight)
 EndIf
@@ -807,7 +818,7 @@ If FileExists(@TempDir & $path_rel_msi_all) Then
   $txtxpos = 2 * $txtxoffset
   $txtypos = 3.5 * $txtyoffset + 1.5 * $txtheight
   If $gergui Then
-    $msiall = GUICtrlCreateCheckbox("Alle auswählen", $txtxpos, $txtypos, $txtwidth, $txtheight)
+    $msiall = GUICtrlCreateCheckbox("Alle auswï¿½hlen", $txtxpos, $txtypos, $txtwidth, $txtheight)
   Else
     $msiall = GUICtrlCreateCheckbox("Select all", $txtxpos, $txtypos, $txtwidth, $txtheight)
   EndIf
@@ -853,7 +864,7 @@ GUICtrlSetResizing (-1, $GUI_DOCKRIGHT + $GUI_DOCKBOTTOM)
 GUISetState()
 If ( (@OSVersion = "WIN_XP") OR (@OSVersion = "WIN_2003") OR (@OSVersion = "WIN_8") OR (@OSVersion = "WIN_VISTA") OR (@OSVersion = "WIN_2008") OR (@OSVersion = "WIN_7") OR (@OSVersion = "WIN_2008R2") ) Then
   If $gergui Then
-    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Nicht unterstütztes Betriebssystem: " & @OSVersion)
+    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Nicht unterstï¿½tztes Betriebssystem: " & @OSVersion)
   Else
     MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Unsupported Operating System: " & @OSVersion)
   EndIf
@@ -861,7 +872,7 @@ If ( (@OSVersion = "WIN_XP") OR (@OSVersion = "WIN_2003") OR (@OSVersion = "WIN_
 EndIf
 If NOT WSHAvailable() Then
   If $gergui Then
-    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Der Windows Script Host ist deaktiviert. Bitte prüfen Sie die Registrierungswerte" _
+    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Der Windows Script Host ist deaktiviert. Bitte prï¿½fen Sie die Registrierungswerte" _
                      & @LF & "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows Script Host\Settings\Enabled und" _
                      & @LF & "HKEY_CURRENT_USER\Software\Microsoft\Windows Script Host\Settings\Enabled")
   Else
@@ -903,8 +914,8 @@ If NOT PathValid(@TempDir) Then
 EndIf
 If (StringRight(EnvGet("TEMP"), 1) = "\") OR (StringRight(EnvGet("TEMP"), 1) = ":") Then
   If $gergui Then
-    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Der %TEMP%-Pfad enthält einen abschließenden Backslash ('\')" _
-                     & @LF & "oder einen abschließenden Doppelpunkt (':').")
+    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Der %TEMP%-Pfad enthï¿½lt einen abschlieï¿½enden Backslash ('\')" _
+                     & @LF & "oder einen abschlieï¿½enden Doppelpunkt (':').")
   Else
     MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Error", "The %TEMP% path contains a trailing backslash ('\')" _
                     & @LF & "or a trailing colon (':').")
@@ -938,13 +949,13 @@ EndIf
 If ( BuildUpgradeEnforced() > 0 ) Then
   If BuildUpgradeAvailable($scriptdir, 1) Then
     If $gergui Then
-      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONINFORMATION, $MB_OK), "Information", "Auf diesem System wird das Feature Update über Enablement Package automatisch installiert, wenn Sie die Aktualisierung starten.")
+      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONINFORMATION, $MB_OK), "Information", "Auf diesem System wird das Feature Update ï¿½ber Enablement Package automatisch installiert, wenn Sie die Aktualisierung starten.")
     Else
       MsgBox(BitOr($MB_TASKMODAL, $MB_ICONINFORMATION, $MB_OK), "Information", "On this system, the Feature Update via Enablement Package will be automatically installed, when you start the updating process.")
     EndIf
   Else
     If $gergui Then
-      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONWARNING, $MB_OK), "Warnung", "Auf diesem System wird eine nicht unterstützte Version von Windows 10 ausgeführt, welche nicht automatisch aktualisiert werden kann." & @LF & "Die Update-Ermittlung kann fehlende Updates für Windows melden.")
+      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONWARNING, $MB_OK), "Warnung", "Auf diesem System wird eine nicht unterstï¿½tzte Version von Windows 10 ausgefï¿½hrt, welche nicht automatisch aktualisiert werden kann." & @LF & "Die Update-Ermittlung kann fehlende Updates fï¿½r Windows melden.")
     Else
       MsgBox(BitOr($MB_TASKMODAL, $MB_ICONWARNING, $MB_OK), "Warning", "This system is running a version of Windows 10, which cannot be automatically upgraded to a supported one." & @LF & "The dynamic update search might report missing updates for Windows.")
     EndIf
@@ -979,8 +990,8 @@ While 1
       If IsCheckBoxChecked($autoreboot) Then
         If $gergui Then
           If MsgBox(BitOr($MB_TASKMODAL, $MB_DEFBUTTON2, $MB_ICONEXCLAMATION, $MB_YESNO), "Warnung", "Die Option 'Automatisch neu starten und fortsetzen' deaktiviert" _
-                               & @LF & "temporär die Benutzerkontensteuerung (UAC), falls erforderlich." _
-                               & @LF & "Möchten Sie fortsetzen?") = 7 Then
+                               & @LF & "temporï¿½r die Benutzerkontensteuerung (UAC), falls erforderlich." _
+                               & @LF & "Mï¿½chten Sie fortsetzen?") = 7 Then
             GUICtrlSetState($autoreboot, $GUI_UNCHECKED)
           EndIf
         Else
@@ -997,7 +1008,7 @@ While 1
                                & @LF & "Die Option 'Automatisch neu starten und fortsetzen'" _
                                & @LF & "funktioniert nur dann ohne Benutzereingriff," _
                                & @LF & "wenn diese Freigabe anonymen Zugriff erlaubt." _
-                               & @LF & "Möchten Sie fortsetzen?") = 7 Then
+                               & @LF & "Mï¿½chten Sie fortsetzen?") = 7 Then
             GUICtrlSetState($autoreboot, $GUI_UNCHECKED)
           EndIf
         Else
@@ -1121,7 +1132,7 @@ While 1
         $dllCallResult = DllCall("kernel32.dll", "bool", "Wow64DisableWow64FsRedirection", "ptr*", DllStructGetPtr($pRedirect))
         If (@error <> 0) OR (NOT $dllCallResult[0]) Then
           If $gergui Then
-            MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler #" & @error & " (Rückgabewert: " & $dllCallResult[0] _
+            MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler #" & @error & " (Rï¿½ckgabewert: " & $dllCallResult[0] _
                                    & ", API-Fehlercode: " & _WinAPI_GetLastError() & ")" _
                                    & " beim Aufruf von Wow64DisableWow64FsRedirection.")
           Else

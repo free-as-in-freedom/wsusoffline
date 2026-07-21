@@ -1,1 +1,3 @@
 deploy-local.cmd
+MakeReleaseUnzipped.cmd
+static/custom/StaticDownloadLinks-w100-x64-glb.txt
