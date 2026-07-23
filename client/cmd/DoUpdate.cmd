@@ -741,6 +741,13 @@ if "%WOU_BUILDUPGRADE_PREUPD%"=="" goto SkipBuildUpgrade
 if "%WOU_BUILDUPGRADE_NEWBUILD%"=="" goto SkipBuildUpgrade
 if "%WOU_BUILDUPGRADE_EPKGID%"=="" goto SkipBuildUpgrade
 
+rem A fresh run should always re-evaluate the build upgrade against the current
+rem system state, rather than being blocked by a "_tried" marker left behind by
+rem an earlier run/reboot cycle (these markers are only meant to guard against
+rem re-entry within a single execution, not to persist across reboots).
+if exist %SystemRoot%\Temp\wou_buildupgrade_prep_tried.txt del %SystemRoot%\Temp\wou_buildupgrade_prep_tried.txt
+if exist %SystemRoot%\Temp\wou_buildupgrade_tried.txt del %SystemRoot%\Temp\wou_buildupgrade_tried.txt
+
 if %OS_VER_REVIS% GEQ %WOU_BUILDUPGRADE_MINREVIS% goto PerformBuildUpgrade
 
 :PrepareBuildUpgrade
