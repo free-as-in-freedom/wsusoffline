@@ -121,13 +121,6 @@ if exist ..\static\custom\StaticDownloadLinks-dotnet.txt (
     )
   )
 )
-set OX64_LANG=
-for %%i in (enu fra esn jpn kor rus ptg ptb deu nld ita chs cht plk hun csy sve trk ell ara heb dan nor fin) do (
-  if exist ..\static\custom\StaticDownloadLinks-o2k13-%%i.txt (
-    set OX64_LANG=%%i !OX64_LANG!
-    call RemoveOffice2010x64Support.cmd %%i /quiet
-  )
-)
 echo %DATE% %TIME% - Info: Preserved custom language and architecture additions and removals>>%DOWNLOAD_LOGFILE%
 echo Updating WSUS Offline Update - Community Edition...
 %SystemRoot%\System32\xcopy.exe ..\wsusoffline .. /S /Q /Y
@@ -139,9 +132,6 @@ if "%REMOVE_CMD%" NEQ "" (
 )
 if "%CUST_LANG%" NEQ "" (
   for %%i in (%CUST_LANG%) do call AddCustomLanguageSupport.cmd %%i /quiet
-)
-if "%OX64_LANG%" NEQ "" (
-  for %%i in (%OX64_LANG%) do call AddOffice2010x64Support.cmd %%i /quiet
 )
 echo %DATE% %TIME% - Info: Restored custom language and architecture additions and removals>>%DOWNLOAD_LOGFILE%
 if exist ..\exclude\ExcludeList-superseded.txt (
@@ -176,7 +166,7 @@ echo.
 echo ERROR: VBScript interpreter %CSCRIPT_PATH% not found.
 echo %DATE% %TIME% - Error: VBScript interpreter %CSCRIPT_PATH% not found>>%DOWNLOAD_LOGFILE%
 echo.
-goto Error
+goto EoF
 
 :NoWGet
 echo.

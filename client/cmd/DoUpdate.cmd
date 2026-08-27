@@ -149,9 +149,8 @@ if "%OS_NAME%"=="wxp" goto UnsupOS
 if "%OS_NAME%"=="w2k3" goto UnsupOS
 if "%OS_NAME%"=="w60" goto UnsupOS
 if "%OS_NAME%"=="w61" goto UnsupOS
-if "%OS_NAME%"=="w62" (
-  if /i "%OS_ARCH%"=="x86" goto UnsupOS
-)
+if "%OS_NAME%"=="w62" goto UnsupOS
+if "%OS_NAME%"=="w63" goto UnsupOS
 for %%i in (x86 x64) do (if /i "%OS_ARCH%"=="%%i" goto ValidArch)
 goto UnsupArch
 :ValidArch
@@ -197,9 +196,6 @@ rem echo Found Microsoft .NET Framework 3.5 version: %DOTNET35_VER_MAJOR%.%DOTNE
 rem echo Found Microsoft .NET Framework 4 version: %DOTNET4_VER_MAJOR%.%DOTNET4_VER_MINOR%.%DOTNET4_VER_BUILD% (release: %DOTNET4_RELEASE%)
 rem echo Found Windows Management Framework version: %WMF_VER_MAJOR%.%WMF_VER_MINOR%.%WMF_VER_BUILD%.%WMF_VER_REVIS%
 rem echo Found Windows Defender definitions version: %WDDEFS_VER_MAJOR%.%WDDEFS_VER_MINOR%.%WDDEFS_VER_BUILD%.%WDDEFS_VER_REVIS%
-if "%O2K13_VER_MAJOR%" NEQ "" (
-  echo Found Microsoft Office 2013 version: %O2K13_VER_MAJOR%.%O2K13_VER_MINOR%.%O2K13_VER_BUILD%.%O2K13_VER_REVIS% ^(o2k13 %O2K13_ARCH% %O2K13_LANG% sp%O2K13_SP_VER%^)
-)
 if "%O2K16_VER_MAJOR%" NEQ "" (
   echo Found Microsoft Office 2016 version: %O2K16_VER_MAJOR%.%O2K16_VER_MINOR%.%O2K16_VER_BUILD%.%O2K16_VER_REVIS% ^(o2k16 %O2K16_ARCH% %O2K16_LANG% sp%O2K16_SP_VER%^)
 )
@@ -219,9 +215,6 @@ call :Log "Info: Found Microsoft .NET Framework 3.5 version %DOTNET35_VER_MAJOR%
 call :Log "Info: Found Microsoft .NET Framework 4 version %DOTNET4_VER_MAJOR%.%DOTNET4_VER_MINOR%.%DOTNET4_VER_BUILD% (release: %DOTNET4_RELEASE%)"
 call :Log "Info: Found Windows Management Framework version %WMF_VER_MAJOR%.%WMF_VER_MINOR%.%WMF_VER_BUILD%.%WMF_VER_REVIS%"
 call :Log "Info: Found Windows Defender definitions version %WDDEFS_VER_MAJOR%.%WDDEFS_VER_MINOR%.%WDDEFS_VER_BUILD%.%WDDEFS_VER_REVIS%"
-if "%O2K13_VER_MAJOR%" NEQ "" (
-  call :Log "Info: Found Microsoft Office 2013 version %O2K13_VER_MAJOR%.%O2K13_VER_MINOR%.%O2K13_VER_BUILD%.%O2K13_VER_REVIS% (o2k13 %O2K13_ARCH% %O2K13_LANG% sp%O2K13_SP_VER%)"
-)
 if "%O2K16_VER_MAJOR%" NEQ "" (
   call :Log "Info: Found Microsoft Office 2016 version %O2K16_VER_MAJOR%.%O2K16_VER_MINOR%.%O2K16_VER_BUILD%.%O2K16_VER_REVIS% (o2k16 %O2K16_ARCH% %O2K16_LANG% sp%O2K16_SP_VER%)"
 )
@@ -281,17 +274,6 @@ set JUST_OFFICE=1
 :CheckOfficeMedium
 if not "%OFC_INSTALLED%"=="1" (if "%JUST_OFFICE%"=="1" (goto InvalidMedium) else (goto ProperMedium))
 set OFFICE_SUPPORTED=0
-if not "%O2K13_VER_MAJOR%"=="" (
-  if exist ..\o2k13\%O2K13_LANG%\nul (
-    echo Medium supports Microsoft Office ^(o2k13 %O2K13_LANG%^).
-    call :Log "Info: Medium supports Microsoft Office (o2k13 %O2K13_LANG%)"
-    set OFFICE_SUPPORTED=1
-  ) else if exist ..\o2k13\glb\nul (
-    echo Medium supports Microsoft Office ^(o2k13 glb^).
-    call :Log "Info: Medium supports Microsoft Office (o2k13 glb)"
-    set OFFICE_SUPPORTED=1
-  )
-)
 if not "%O2K16_VER_MAJOR%"=="" (
   if exist ..\o2k16\glb\nul (
     echo Medium supports Microsoft Office ^(o2k16 glb^).
@@ -349,122 +331,6 @@ call :Log "Info: Adjusted power management settings"
 :SkipPowerCfg
 
 if "%JUST_OFFICE%"=="1" goto JustOffice
-rem *** Install Windows Service Pack ***
-goto SP%OS_NAME%
-
-:SPw62
-goto SkipSPInst
-:SPw63
-echo Checking Windows 8.1 / Server 2012 R2 Update Rollup April 2014 installation state...
-if %OS_VER_REVIS% GEQ %OS_UPD1_TARGET_REVIS% goto Upd2w63
-if exist %SystemRoot%\Temp\wou_w63upd1_tried.txt goto SkipSPInst
-%CSCRIPT_PATH% //Nologo //B //E:vbs ListInstalledUpdateIds.vbs
-if exist "%TEMP%\InstalledUpdateIds.txt" (
-  %SystemRoot%\System32\find.exe /I "%OS_SP_TARGET_ID%" "%TEMP%\InstalledUpdateIds.txt" >nul 2>&1
-  if errorlevel 1 (
-    copy /Y ..\static\StaticUpdateIds-w63-upd1.txt "%TEMP%\MissingUpdateIds.txt" >nul
-    del "%TEMP%\InstalledUpdateIds.txt"
-  ) else (
-    %SystemRoot%\System32\findstr.exe /I /V "2939087 %OS_SP_PREREQ_ID% clearcompressionflag %OS_SP_TARGET_ID%" ..\static\StaticUpdateIds-w63-upd1.txt >"%TEMP%\MissingUpdateIds.txt"
-    del "%TEMP%\InstalledUpdateIds.txt"
-  )
-) else (
-  copy /Y ..\static\StaticUpdateIds-w63-upd1.txt "%TEMP%\MissingUpdateIds.txt" >nul
-)
-for %%i in ("%TEMP%\MissingUpdateIds.txt") do if %%~zi==0 del %%i
-if not exist "%TEMP%\MissingUpdateIds.txt" goto Upd2w63
-call ListUpdatesToInstall.cmd /excludestatics /ignoreblacklist
-if errorlevel 1 goto ListError
-if exist "%TEMP%\UpdatesToInstall.txt" (
-  echo Installing Windows 8.1 / Server 2012 R2 Update Rollup April 2014...
-  call :Log "Info: Installing Windows 8.1 / Server 2012 R2 Update Rollup April 2014"
-  call InstallListedUpdates.cmd %VERIFY_MODE% %DISM_MODE% /errorsaswarnings
-  set ERR_LEVEL=!errorlevel!
-  rem echo DoUpdate: ERR_LEVEL=!ERR_LEVEL!
-  if "!ERR_LEVEL!"=="3010" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_w63upd1_tried.txt
-    set REBOOT_REQUIRED=1
-    goto Installed
-  ) else if "!ERR_LEVEL!"=="3011" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_w63upd1_tried.txt
-    set RECALL_REQUIRED=1
-    goto Installed
-  ) else if "!ERR_LEVEL!" GEQ "0" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_w63upd1_tried.txt
-    set RECALL_REQUIRED=1
-    goto Installed
-  ) else (
-    goto InstError
-  )
-) else (
-  echo Warning: Windows 8.1 / Server 2012 R2 Update Rollup April 2014 installation files not found.
-  call :Log "Warning: Windows 8.1 / Server 2012 R2 Update Rollup April 2014 installation files not found"
-  if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-  echo. >%SystemRoot%\Temp\wou_w63upd1_tried.txt
-)
-:Upd2w63
-echo Checking Windows 8.1 / Server 2012 R2 Update Rollup Nov. 2014 installation state...
-if %OS_VER_REVIS% GEQ %OS_UPD2_TARGET_REVIS% goto SkipSPInst
-if exist %SystemRoot%\Temp\wou_w63upd2_tried.txt goto SkipSPInst
-copy /Y ..\static\StaticUpdateIds-w63-upd2.txt "%TEMP%\StaticUpdateIds-w63-upd2.txt" >nul
-if %OS_DOMAIN_ROLE% GEQ 2 echo 3016437>>"%TEMP%\StaticUpdateIds-w63-upd2.txt"
-%CSCRIPT_PATH% //Nologo //B //E:vbs ListInstalledUpdateIds.vbs
-if exist "%TEMP%\InstalledUpdateIds.txt" (
-  %SystemRoot%\System32\findstr.exe /L /I /V /G:"%TEMP%\InstalledUpdateIds.txt" "%TEMP%\StaticUpdateIds-w63-upd2.txt" >"%TEMP%\MissingUpdateIds.txt"
-  del "%TEMP%\InstalledUpdateIds.txt"
-) else (
-  copy /Y "%TEMP%\StaticUpdateIds-w63-upd2.txt" "%TEMP%\MissingUpdateIds.txt" >nul
-)
-del "%TEMP%\StaticUpdateIds-w63-upd2.txt"
-for %%i in ("%TEMP%\MissingUpdateIds.txt") do if %%~zi==0 del %%i
-if not exist "%TEMP%\MissingUpdateIds.txt" goto SkipSPInst
-call ListUpdatesToInstall.cmd /excludestatics /ignoreblacklist
-if errorlevel 1 goto ListError
-if exist "%TEMP%\UpdatesToInstall.txt" (
-  echo Installing Windows 8.1 / Server 2012 R2 Update Rollup Nov. 2014...
-  call :Log "Info: Installing Windows 8.1 / Server 2012 R2 Update Rollup Nov. 2014"
-  call InstallListedUpdates.cmd %VERIFY_MODE% %DISM_MODE% /errorsaswarnings
-  set ERR_LEVEL=!errorlevel!
-  rem echo DoUpdate: ERR_LEVEL=!ERR_LEVEL!
-  if "!ERR_LEVEL!"=="3010" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_w63upd2_tried.txt
-    set REBOOT_REQUIRED=1
-    goto Installed
-  ) else if "!ERR_LEVEL!"=="3011" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_w63upd2_tried.txt
-    set RECALL_REQUIRED=1
-    goto Installed
-  ) else if "!ERR_LEVEL!" GEQ "0" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_w63upd2_tried.txt
-    set RECALL_REQUIRED=1
-    goto Installed
-  ) else (
-    goto InstError
-  )
-) else (
-  echo Warning: Windows 8.1 / Server 2012 R2 Update Rollup Nov. 2014 installation files not found.
-  call :Log "Warning: Windows 8.1 / Server 2012 R2 Update Rollup Nov. 2014 installation files not found"
-  if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-  echo. >%SystemRoot%\Temp\wou_w63upd2_tried.txt
-)
-goto SPInstalled
-:SPw100
-goto SkipSPInst
-:SPInstalled
-if "%REBOOT_REQUIRED%"=="1" (
-  if "%RECALL_REQUIRED%" NEQ "1" (
-    set RECALL_REQUIRED=1
-  )
-)
-if "%RECALL_REQUIRED%"=="1" goto Installed
-if "%REBOOT_REQUIRED%"=="1" goto Installed
-:SkipSPInst
 
 rem *** Install Trusted Root Certificates and Certificate revocation lists ***
 if "%UPDATE_RCERTS%" NEQ "/updatercerts" goto SkipTRCertsInst
@@ -872,91 +738,6 @@ if %IE_VER_REVIS% GEQ %IE_VER_TARGET_REVIS% goto SkipIEInst
 :InstallIE
 goto IE%OS_NAME%
 
-:IEw62
-if /i "%OS_ARCH%" NEQ "x64" goto SkipIEInst
-if exist %SystemRoot%\Temp\wou_ie_tried.txt goto SkipIEInst
-set IE_FILENAME=..\%OS_NAME%-%OS_ARCH%\glb\ie11-win6.2*.msu
-set IE_LANG_FILENAME=..\%OS_NAME%-%OS_ARCH%\glb\ie11-windows6.2-languagepack-%OS_ARCH%-%OS_LANG_EXT%*.msu
-dir /B %IE_FILENAME% >nul 2>&1
-if errorlevel 1 (
-  echo Warning: File %IE_FILENAME% not found.
-  call :Log "Warning: File %IE_FILENAME% not found"
-  goto SkipIEInst
-)
-if exist %SystemRoot%\Temp\wou_iepre_tried.txt goto SkipIEw62Pre
-echo Checking Internet Explorer 11 prerequisites...
-%CSCRIPT_PATH% //Nologo //B //E:vbs ListInstalledUpdateIds.vbs
-if exist "%TEMP%\InstalledUpdateIds.txt" (
-  %SystemRoot%\System32\findstr.exe /L /I /V /G:"%TEMP%\InstalledUpdateIds.txt" ..\static\StaticUpdateIds-ie11-w62.txt >"%TEMP%\MissingUpdateIds.txt"
-  del "%TEMP%\InstalledUpdateIds.txt"
-) else (
-  copy /Y ..\static\StaticUpdateIds-ie11-w62.txt "%TEMP%\MissingUpdateIds.txt" >nul
-)
-call ListUpdatesToInstall.cmd /excludestatics /ignoreblacklist
-if errorlevel 1 goto ListError
-if exist "%TEMP%\UpdatesToInstall.txt" (
-  echo Installing Internet Explorer 11 prerequisites...
-  call InstallListedUpdates.cmd /selectoptions %VERIFY_MODE% %DISM_MODE% /ignoreerrors
-  set ERR_LEVEL=!errorlevel!
-  rem echo DoUpdate: ERR_LEVEL=!ERR_LEVEL!
-  if "!ERR_LEVEL!"=="3010" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_iepre_tried.txt
-    set REBOOT_REQUIRED=1
-    goto IEInstalled
-  ) else if "!ERR_LEVEL!"=="3011" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_iepre_tried.txt
-    set RECALL_REQUIRED=1
-    goto IEInstalled
-  ) else if "!ERR_LEVEL!" GEQ "0" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_iepre_tried.txt
-    rem FIXME 12.5 (b69)
-    set RECALL_REQUIRED=1
-    goto IEInstalled
-  )
-)
-:SkipIEw62Pre
-echo Installing Internet Explorer 11...
-for /F %%i in ('dir /B %IE_FILENAME%') do (
-  call InstallOSUpdate.cmd "..\%OS_NAME%-%OS_ARCH%\glb\%%i" %VERIFY_MODE% /ignoreerrors
-  set ERR_LEVEL=!errorlevel!
-  rem echo DoUpdate: ERR_LEVEL=!ERR_LEVEL!
-  if "!ERR_LEVEL!"=="3010" (
-    set REBOOT_REQUIRED=1
-  ) else if "!ERR_LEVEL!"=="3011" (
-    set RECALL_REQUIRED=1
-  ) else if "!ERR_LEVEL!" NEQ "0" (
-    if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-    echo. >%SystemRoot%\Temp\wou_ie_tried.txt
-    goto IEInstalled
-  )
-
-  rem FIXME 12.5 (b69)
-  set RECALL_REQUIRED=1
-
-  dir /B %IE_LANG_FILENAME% >nul 2>&1
-  if not errorlevel 1 (
-    echo Installing Internet Explorer 11 language pack...
-    for /F %%i in ('dir /B %IE_LANG_FILENAME%') do (
-      call InstallOSUpdate.cmd "..\%OS_NAME%-%OS_ARCH%\glb\%%i" %VERIFY_MODE% /ignoreerrors
-      set ERR_LEVEL=!errorlevel!
-      rem echo DoUpdate: ERR_LEVEL=!ERR_LEVEL!
-      if "!ERR_LEVEL!"=="3010" (
-        set REBOOT_REQUIRED=1
-      ) else if "!ERR_LEVEL!"=="3011" (
-        set RECALL_REQUIRED=1
-      )
-    )
-  )
-
-  if not exist %SystemRoot%\Temp\nul md %SystemRoot%\Temp
-  echo. >%SystemRoot%\Temp\wou_ie_tried.txt
-)
-goto IEInstalled
-
-:IEw63
 :IEw100
 :IEInstalled
 set IE_FILENAME=
@@ -1542,9 +1323,6 @@ if not "%OFC_INSTALLED%"=="1" goto SkipOffice
 rem *** Check Office Service Pack versions ***
 echo Checking Office Service Pack versions...
 if exist "%TEMP%\MissingUpdateIds.txt" del "%TEMP%\MissingUpdateIds.txt"
-if "%O2K13_VER_MAJOR%"=="" goto SkipSPo2k13
-if %O2K13_SP_VER% LSS %O2K13_SP_VER_TARGET% echo %O2K13_SP_TARGET_ID%>>"%TEMP%\MissingUpdateIds.txt"
-:SkipSPo2k13
 if "%O2K16_VER_MAJOR%"=="" goto SkipSPo2k16
 if %O2K16_SP_VER% LSS %O2K16_SP_VER_TARGET% echo %O2K16_SP_TARGET_ID%>>"%TEMP%\MissingUpdateIds.txt"
 :SkipSPo2k16
@@ -2096,10 +1874,7 @@ if exist %SystemRoot%\woubak-pwrscheme-temp.txt (
 goto :eof
 
 :Cleanup
-if exist %SystemRoot%\Temp\wou_w63upd1_tried.txt del %SystemRoot%\Temp\wou_w63upd1_tried.txt
-if exist %SystemRoot%\Temp\wou_w63upd2_tried.txt del %SystemRoot%\Temp\wou_w63upd2_tried.txt
 if exist %SystemRoot%\Temp\wou_wua_tried.txt del %SystemRoot%\Temp\wou_wua_tried.txt
-if exist %SystemRoot%\Temp\wou_iepre_tried.txt del %SystemRoot%\Temp\wou_iepre_tried.txt
 if exist %SystemRoot%\Temp\wou_ie_tried.txt del %SystemRoot%\Temp\wou_ie_tried.txt
 if exist %SystemRoot%\Temp\wou_msedge_tried.txt del %SystemRoot%\Temp\wou_msedge_tried.txt
 if exist %SystemRoot%\Temp\wou_net35_tried.txt del %SystemRoot%\Temp\wou_net35_tried.txt

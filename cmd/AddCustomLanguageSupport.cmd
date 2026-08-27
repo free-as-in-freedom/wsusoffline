@@ -19,13 +19,6 @@ if /i "%2" NEQ "/quiet" echo Adding support for %1 to .NET custom URL files...
 if exist ..\static\StaticDownloadLinks-dotnet-%1.txt (
   type ..\static\StaticDownloadLinks-dotnet-%1.txt >>..\static\custom\StaticDownloadLinks-dotnet.txt
 )
-rem *** Add support for %1 to IEx custom URL files ***
-if /i "%2" NEQ "/quiet" echo Adding support for %1 to IEx custom URL files...
-for %%i in (x86 x64) do (
-  if exist ..\static\StaticDownloadLinks-ie11-w62-%%i-%1.txt (
-    type ..\static\StaticDownloadLinks-ie11-w62-%%i-%1.txt >>..\static\custom\StaticDownloadLinks-w62-%%i-glb.txt
-  )
-)
 goto EoF
 
 :NoExtensions

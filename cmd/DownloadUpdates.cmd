@@ -65,115 +65,12 @@ if exist .\custom\InitializationHook.cmd (
 )
 call :Log "Info: Starting WSUS Offline Update - Community Edition - download v. %WSUSOFFLINE_VERSION% for %1 %2"
 
-for %%i in (w62-x64 w63 w63-x64 w100 w100-x64 o2k16) do (
+for %%i in (w100-x64 o2k16) do (
   if /i "%1"=="%%i" (
     if /i "%2"=="glb" goto EvalParams
   )
 )
-for %%i in (o2k13) do (
-  if /i "%1"=="%%i" (
-    for %%j in (enu fra esn jpn kor rus ptg ptb deu nld ita chs cht plk hun csy sve trk ell ara heb dan nor fin) do (if /i "%2"=="%%j" goto Lang_%%j)
-  )
-)
 goto InvalidParams
-
-rem The variable LANG_SHORT was replaced with LOCALE_LONG, consisting of
-rem the language and region code, e.g. de-de or en-us.
-:Lang_enu
-set LOCALE_LONG=en-us
-goto EvalParams
-
-:Lang_fra
-set LOCALE_LONG=fr-fr
-goto EvalParams
-
-:Lang_esn
-set LOCALE_LONG=es-es
-goto EvalParams
-
-:Lang_jpn
-set LOCALE_LONG=ja-jp
-goto EvalParams
-
-:Lang_kor
-set LOCALE_LONG=ko-kr
-goto EvalParams
-
-:Lang_rus
-set LOCALE_LONG=ru-ru
-goto EvalParams
-
-:Lang_ptg
-set LOCALE_LONG=pt-pt
-goto EvalParams
-
-:Lang_ptb
-set LOCALE_LONG=pt-br
-goto EvalParams
-
-:Lang_deu
-set LOCALE_LONG=de-de
-goto EvalParams
-
-:Lang_nld
-set LOCALE_LONG=nl-nl
-goto EvalParams
-
-:Lang_ita
-set LOCALE_LONG=it-it
-goto EvalParams
-
-:Lang_chs
-set LOCALE_LONG=zh-cn
-goto EvalParams
-
-:Lang_cht
-set LOCALE_LONG=zh-tw
-goto EvalParams
-
-:Lang_plk
-set LOCALE_LONG=pl-pl
-goto EvalParams
-
-:Lang_hun
-set LOCALE_LONG=hu-hu
-goto EvalParams
-
-:Lang_csy
-set LOCALE_LONG=cs-cz
-goto EvalParams
-
-:Lang_sve
-set LOCALE_LONG=sv-se
-goto EvalParams
-
-:Lang_trk
-set LOCALE_LONG=tr-tr
-goto EvalParams
-
-:Lang_ell
-set LOCALE_LONG=el-gr
-goto EvalParams
-
-:Lang_ara
-set LOCALE_LONG=ar-sa
-goto EvalParams
-
-:Lang_heb
-set LOCALE_LONG=he-il
-goto EvalParams
-
-:Lang_dan
-set LOCALE_LONG=da-dk
-goto EvalParams
-
-:Lang_nor
-set LOCALE_LONG=nb-no
-goto EvalParams
-
-:Lang_fin
-set LOCALE_LONG=fi-fi
-goto EvalParams
 
 :EvalParams
 if "%3"=="" goto NoMoreParams
@@ -348,9 +245,6 @@ if exist ..\xslt\ExtractUpdateFileIdsAndLocations.xsl del ..\xslt\ExtractUpdateF
 if exist ..\xslt\ExtractUpdateRevisionAndFileIds.xsl del ..\xslt\ExtractUpdateRevisionAndFileIds.xsl
 if exist ..\xslt\ExtractUpdateRevisionIds.xsl del ..\xslt\ExtractUpdateRevisionIds.xsl
 if exist ..\xslt\extract-office-revision-and-update-ids.xsl del ..\xslt\extract-office-revision-and-update-ids.xsl
-if exist ..\xslt\ExtractDownloadLinks-w62-x64-glb.xsl del ..\xslt\ExtractDownloadLinks-w62-x64-glb.xsl
-if exist ..\xslt\ExtractDownloadLinks-w63-x64-glb.xsl del ..\xslt\ExtractDownloadLinks-w63-x64-glb.xsl
-if exist ..\xslt\ExtractDownloadLinks-w63-x86-glb.xsl del ..\xslt\ExtractDownloadLinks-w63-x86-glb.xsl
 if exist ..\xslt\ExtractDownloadLinks-w100-x64-glb.xsl del ..\xslt\ExtractDownloadLinks-w100-x64-glb.xsl
 if exist ..\xslt\ExtractDownloadLinks-w100-x86-glb.xsl del ..\xslt\ExtractDownloadLinks-w100-x86-glb.xsl
 del /Q ..\xslt\*-win-x86-*.* >nul 2>&1
@@ -469,12 +363,6 @@ if exist ..\static\StaticDownloadLinks-w61-x64-alg.txt del ..\static\StaticDownl
 if exist ..\static\StaticDownloadLinks-w61-x86-alg.txt del ..\static\StaticDownloadLinks-w61-x86-alg.txt
 
 rem *** Windows 8 stuff ***
-if exist ..\client\static\StaticUpdateIds-w62-x86.txt del ..\client\static\StaticUpdateIds-w62-x86.txt
-if exist ..\exclude\ExcludeList-w62-x86.txt del ..\exclude\ExcludeList-w62-x86.txt
-if exist ..\exclude\ExcludeListISO-w62-x86.txt del ..\exclude\ExcludeListISO-w62-x86.txt
-if exist ..\exclude\ExcludeListUSB-w62-x86.txt del ..\exclude\ExcludeListUSB-w62-x86.txt
-if exist ..\static\StaticDownloadLinks-w62-x86-glb.txt del ..\static\StaticDownloadLinks-w62-x86-glb.txt
-if exist ..\xslt\ExtractDownloadLinks-w62-x86-glb.xsl del ..\xslt\ExtractDownloadLinks-w62-x86-glb.xsl
 
 rem *** Windows 10 Version 1511 stuff ***
 if exist ..\client\static\StaticUpdateIds-w100-10586-x64.txt del ..\client\static\StaticUpdateIds-w100-10586-x64.txt
@@ -687,13 +575,6 @@ if exist ..\static\custom\StaticDownloadLinks-dotnet.txt (
     )
   )
 )
-set OX64_LANG=
-for %%i in (enu fra esn jpn kor rus ptg ptb deu nld ita chs cht plk hun csy sve trk ell ara heb dan nor fin) do (
-  if exist ..\static\custom\StaticDownloadLinks-o2k13-%%i.txt (
-    set OX64_LANG=%%i !OX64_LANG!
-    call RemoveOffice2010x64Support.cmd %%i /quiet
-  )
-)
 call :Log "Info: Preserved custom language and architecture additions and removals"
 
 echo Updating static and exclude definitions for download and update...
@@ -813,11 +694,7 @@ echo Restoring custom language and architecture additions and removals...
 if "%CUST_LANG%" NEQ "" (
   for %%i in (%CUST_LANG%) do call AddCustomLanguageSupport.cmd %%i /quiet
 )
-if "%OX64_LANG%" NEQ "" (
-  for %%i in (%OX64_LANG%) do call AddOffice2010x64Support.cmd %%i /quiet
-)
 set CUST_LANG=
-set OX64_LANG=
 call :Log "Info: Restored custom language and architecture additions and removals"
 :SkipSDD
 
@@ -1130,7 +1007,7 @@ for %%i in (..\client\md\hashes-cpp.txt) do if %%~zi==0 del %%i
 rem *** Download Microsoft Edge (Chromium) installation files ***
 if "%SKIP_DL%"=="1" goto SkipMSEdge
 set SKIP_MSEDGE=1
-for %%i in (w62-x64 w63 w63-x64 w100 w100-x64) do (
+for %%i in (w100-x64) do (
   if /i "%1"=="%%i" (
     set SKIP_MSEDGE=0
   )
@@ -1320,22 +1197,14 @@ for %%i in (..\client\md\hashes-wddefs-%TARGET_ARCH%-glb.txt) do if %%~zi==0 del
 
 rem *** Download the platform specific patches ***
 if "%EXC_WINGLB%"=="1" goto SkipWinGlb
-for %%i in (w62-x64 w63 w63-x64 w100 w100-x64) do (
+for %%i in (w100-x64) do (
   if /i "%1"=="%%i" (
     call :DownloadCore win glb x86 /skipdynamic
     if errorlevel 1 goto Error
   )
 )
 :SkipWinGlb
-for %%i in (o2k13) do (
-  if /i "%1"=="%%i" (
-    call :DownloadCore %1 glb %TARGET_ARCH% %SKIP_PARAM%
-    if errorlevel 1 goto Error
-    call :DownloadCore %1 %2 %TARGET_ARCH% %SKIP_PARAM%
-    if errorlevel 1 goto Error
-  )
-)
-for %%i in (w62-x64 w63 w63-x64 w100 w100-x64 o2k16) do (
+for %%i in (w100-x64 o2k16) do (
   if /i "%1"=="%%i" (
     call :DownloadCore %1 glb %TARGET_ARCH% %SKIP_PARAM%
     if errorlevel 1 goto Error
@@ -1344,7 +1213,7 @@ for %%i in (w62-x64 w63 w63-x64 w100 w100-x64 o2k16) do (
 goto RemindDate
 
 :DownloadCore
-rem %1 = platform (w62, w62-x64, w63, w63-x64, w100, w100-x64, win, o2k13, o2k16)
+rem %1 = platform (w100-x64, win, o2k16)
 rem %2 = language
 rem %3 = architecture (x86, x64)
 rem %4 = "/skipdownload" / "/skipdynamic"
@@ -1632,12 +1501,6 @@ if exist ..\exclude\custom\ExcludeList-superseded-exclude.txt (
   type ..\exclude\custom\ExcludeList-superseded-exclude.txt >>"%TEMP%\ExcludeList-superseded-exclude.txt"
   type ..\exclude\custom\ExcludeList-superseded-exclude.txt >>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
 )
-for %%i in (upd1 upd2) do (
-  for /F %%j in ('type ..\client\static\StaticUpdateIds-w63-%%i.txt ^| find /i "kb"') do (
-    echo windows8.1-%%j>>"%TEMP%\ExcludeList-superseded-exclude.txt"
-    echo windows8.1-%%j>>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
-  )
-)
 for /F "tokens=3 delims=," %%c in (..\client\static\StaticUpdateIds-BuildUpgrades.txt) do (
   echo windows10.0-%%c>>"%TEMP%\ExcludeList-superseded-exclude.txt"
   echo windows10.0-%%c>>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
@@ -1652,18 +1515,6 @@ if exist ..\exclude\ExcludeList-superseded-exclude-seconly.txt (
 )
 if exist ..\exclude\custom\ExcludeList-superseded-exclude-seconly.txt (
   type ..\exclude\custom\ExcludeList-superseded-exclude-seconly.txt >>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
-)
-for %%i in (w62 w63) do (
-  for /F %%j in ('dir /B "..\client\static\StaticUpdateIds-%%i*-seconly.txt" 2^>nul') do (
-    for /F "tokens=1* delims=,;" %%k in (..\client\static\%%j) do (
-      echo %%k>>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
-    )
-  )
-  for /F %%j in ('dir /B "..\client\static\custom\StaticUpdateIds-%%i*-seconly.txt" 2^>nul') do (
-    for /F "tokens=1* delims=,;" %%k in (..\client\static\custom\%%j) do (
-      echo %%k>>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
-    )
-  )
 )
 for %%i in ("%TEMP%\ExcludeList-superseded-exclude.txt") do if %%~zi==0 del %%i
 for %%i in ("%TEMP%\ExcludeList-superseded-exclude-seconly.txt") do if %%~zi==0 del %%i
@@ -1745,12 +1596,6 @@ if not exist "%TEMP%\StaticDownloadLinks-%1-%2.txt" goto SkipStatics
 :EvalStatics
 if exist "%TEMP%\ExcludeListStatic.txt" del "%TEMP%\ExcludeListStatic.txt"
 if exist ..\exclude\custom\ExcludeListForce-all.txt copy /Y ..\exclude\custom\ExcludeListForce-all.txt "%TEMP%\ExcludeListStatic.txt" >nul
-if "%TMP_PLATFORM%"=="w63" (
-  if "%EXC_SP%"=="1" (
-    type "..\client\static\StaticUpdateIds-w63-upd1.txt" >>"%TEMP%\ExcludeListStatic.txt"
-    type "..\client\static\StaticUpdateIds-w63-upd2.txt" >>"%TEMP%\ExcludeListStatic.txt"
-  )
-)
 if exist "%TEMP%\ExcludeListStatic.txt" (
   %SystemRoot%\System32\findstr.exe /L /I /V /G:"%TEMP%\ExcludeListStatic.txt" "%TEMP%\StaticDownloadLinks-%1-%2.txt" >"%TEMP%\ValidStaticLinks-%1-%2.txt"
   del "%TEMP%\ExcludeListStatic.txt"
@@ -1769,8 +1614,8 @@ if "%4"=="/skipdynamic" (
 )
 if not exist ..\client\UpdateTable\nul md ..\client\UpdateTable
 
-set PLATFORM_WINDOWS=w62 w63 w100
-set PLATFORM_OFFICE=o2k13 o2k16
+set PLATFORM_WINDOWS=w100
+set PLATFORM_OFFICE=o2k16
 
 rem *** Determine dynamic update urls for %1 %2 ***
 echo %TIME% - Determining dynamic update urls for %1 %2...
@@ -1864,14 +1709,8 @@ del "%TEMP%\update-ids-and-locations.txt"
 goto DetermineShared
 
 :DetermineOffice
-rem Separate the updates into global and localized versions
-if "%2"=="glb" (
-  rem Remove all localized files to get the global/multilingual updates
-  %SystemRoot%\System32\findstr.exe /L /I /V /G:"..\exclude\ExcludeList-locales.txt" "%TEMP%\update-ids-and-locations.txt" > "%TEMP%\update-ids-and-locations-%2.txt"
-) else (
-  rem Extract localized files using search strings like "-en-us_"
-  %SystemRoot%\System32\findstr.exe /L /I /C:"-%LOCALE_LONG%_" "%TEMP%\update-ids-and-locations.txt" > "%TEMP%\update-ids-and-locations-%2.txt"
-)
+rem Remove all localized files to get the global/multilingual updates
+%SystemRoot%\System32\findstr.exe /L /I /V /G:"..\exclude\ExcludeList-locales.txt" "%TEMP%\update-ids-and-locations.txt" > "%TEMP%\update-ids-and-locations-%2.txt"
 del "%TEMP%\update-ids-and-locations.txt"
 goto DetermineShared
 
@@ -1935,13 +1774,6 @@ if not "%2"=="glb" (
   if exist ..\exclude\ExcludeList-%TMP_PLATFORM%-%3-lng.txt (
     type ..\exclude\ExcludeList-%TMP_PLATFORM%-%3-lng.txt >> "%TEMP%\ExcludeList-%1.txt"
     if exist ..\exclude\custom\ExcludeList-%TMP_PLATFORM%-%3-lng.txt type ..\exclude\custom\ExcludeList-%TMP_PLATFORM%-%3-lng.txt >>"%TEMP%\ExcludeList-%1.txt"
-  )
-)
-
-if "%TMP_PLATFORM%"=="w63" (
-  if "%EXC_SP%"=="1" (
-    type ..\client\static\StaticUpdateIds-w63-upd1.txt >>"%TEMP%\ExcludeList-%1.txt"
-    type ..\client\static\StaticUpdateIds-w63-upd2.txt >>"%TEMP%\ExcludeList-%1.txt"
   )
 )
 
@@ -2511,7 +2343,7 @@ if exist ..\client\md\hashes-%1-%2.txt (
 if exist "%TEMP%\ValidStaticLinks-%1-%2.txt" del "%TEMP%\ValidStaticLinks-%1-%2.txt"
 if exist "%TEMP%\ValidDynamicLinks-%1-%2.csv" del "%TEMP%\ValidDynamicLinks-%1-%2.csv"
 if "%4"=="/skipdownload" (
-  for %%i in (win w62 w63 w100) do (
+  for %%i in (win w100) do (
     if /i "%1"=="%%i" (
       if exist "%TEMP%\ValidDynamicLinks-%1-%2.txt" move /Y "%TEMP%\ValidDynamicLinks-%1-%2.txt" ..\static\custom\StaticDownloadLinks-%1-%3-%2.txt >nul
     )
@@ -2672,8 +2504,7 @@ exit /b 1
 :InvalidParams
 echo.
 echo ERROR: Invalid command line: %*
-echo Usage1: %~n0 {o2k13} {enu ^| fra ^| esn ^| jpn ^| kor ^| rus ^| ptg ^| ptb ^| deu ^| nld ^| ita ^| chs ^| cht ^| plk ^| hun ^| csy ^| sve ^| trk ^| ell ^| ara ^| heb ^| dan ^| nor ^| fin} [/excludestatics] [/excludewinglb] [/includedotnet] [/seconly] [/includewddefs] [/nocleanup] [/verify] [/skiptz] [/skipdownload] [/skipdynamic] [/proxy http://[username:password@]^<server^>:^<port^>] [/wsus http://^<server^>] [/wsusonly] [/wsusbyproxy]
-echo Usage2: %~n0 {w62-x64 ^| w63 ^| w63-x64 ^| w100 ^| w100-x64 ^| o2k16} {glb} [/excludestatics] [/excludewinglb] [/includedotnet] [/seconly] [/includewddefs] [/nocleanup] [/verify] [/skiptz] [/skipdownload] [/skipdynamic] [/proxy http://[username:password@]^<server^>:^<port^>] [/wsus http://^<server^>] [/wsusonly] [/wsusbyproxy]
+echo Usage: %~n0 {w100-x64 ^| o2k16} {glb} [/excludestatics] [/excludewinglb] [/includedotnet] [/seconly] [/includewddefs] [/nocleanup] [/verify] [/skiptz] [/skipdownload] [/skipdynamic] [/proxy http://[username:password@]^<server^>:^<port^>] [/wsus http://^<server^>] [/wsusonly] [/wsusbyproxy]
 call :Log "Error: Invalid command line: %*"
 echo.
 goto Error

@@ -93,10 +93,6 @@ if "%OS_NAME%"=="w100" (
     call :EvalStatics ..\static\StaticUpdateIds-%OS_NAME%-dotnet4-%DOTNET4_RELEASE%.txt
   )
 )
-if "%O2K13_VER_MAJOR%" NEQ "" (
-  call :EvalStatics ..\static\custom\StaticUpdateIds-o2k13.txt
-  call :EvalStatics ..\static\StaticUpdateIds-o2k13.txt
-)
 if "%O2K16_VER_MAJOR%" NEQ "" (
   call :EvalStatics ..\static\custom\StaticUpdateIds-o2k16.txt
   call :EvalStatics ..\static\StaticUpdateIds-o2k16.txt
@@ -169,21 +165,6 @@ for /F "usebackq tokens=1,2 delims=," %%i in ("%TEMP%\MissingUpdateIds.txt") do 
           )
         )
       )
-      if not "%O2K13_VER_MAJOR%"=="" (
-        for %%k in (%O2K13_LANG% glb) do (
-          if exist ..\UpdateTable\UpdateTable-o2k13-%%k.csv (
-            for /F "tokens=1,2 delims=," %%l in (..\UpdateTable\UpdateTable-o2k13-%%k.csv) do (
-              if "%%l"=="%%j" (
-                call ListUpdateFile.cmd %%m ..\o2k13\%%k /searchleftmost /append
-                if errorlevel 1 (
-                  rem echo Warning: Update file %%m ^(id: %%j^) not found.
-                  echo %DATE% %TIME% - Warning: Update file %%m ^(id: %%j^) not found>>%UPDATE_LOGFILE%
-                )
-              )
-            )
-          )
-        )
-      )
       if not "%O2K16_VER_MAJOR%"=="" (
         for %%k in (%O2K16_LANG% glb) do (
           if exist ..\UpdateTable\UpdateTable-o2k16-%%k.csv (
@@ -224,14 +205,6 @@ for /F "usebackq tokens=1,2 delims=," %%i in ("%TEMP%\MissingUpdateIds.txt") do 
       )
     )
     rem statisch definierte Office-Updates als EXE
-    if not exist "%TEMP%\Update.txt" (
-      if not "%O2K13_VER_MAJOR%"=="" (
-        for %%k in (%O2K13_LANG% glb) do (
-          call ListUpdateFile.cmd %%i*%O2K13_ARCH% ..\o2k13\%%k
-          call ListUpdateFile.cmd %%i ..\o2k13\%%k
-        )
-      )
-    )
     if not exist "%TEMP%\Update.txt" (
       if not "%O2K16_VER_MAJOR%"=="" (
         for %%k in (%O2K16_LANG% glb) do (

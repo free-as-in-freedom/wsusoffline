@@ -199,29 +199,11 @@ if exist .\exclude\custom\ExcludeList-superseded-exclude.txt (
   type .\exclude\custom\ExcludeList-superseded-exclude.txt >>"%TEMP%\ExcludeList-superseded-exclude.txt"
   type .\exclude\custom\ExcludeList-superseded-exclude.txt >>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
 )
-for %%i in (upd1 upd2) do (
-  for /F %%j in ('type .\client\static\StaticUpdateIds-w63-%%i.txt ^| find /i "kb"') do (
-    echo windows8.1-%%j>>"%TEMP%\ExcludeList-superseded-exclude.txt"
-    echo windows8.1-%%j>>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
-  )
-)
 if exist .\exclude\ExcludeList-superseded-exclude-seconly.txt (
   type .\exclude\ExcludeList-superseded-exclude-seconly.txt >>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
 )
 if exist .\exclude\custom\ExcludeList-superseded-exclude-seconly.txt (
   type .\exclude\custom\ExcludeList-superseded-exclude-seconly.txt >>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
-)
-for %%i in (w62 w63) do (
-  for /F %%j in ('dir /B .\client\static\StaticUpdateIds-%%i*-seconly.txt 2^>nul') do (
-    for /F "tokens=1* delims=,;" %%k in (.\client\static\%%j) do (
-      echo %%k>>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
-    )
-  )
-  for /F %%j in ('dir /B .\client\static\custom\StaticUpdateIds-%%i*-seconly.txt 2^>nul') do (
-    for /F "tokens=1* delims=,;" %%k in (.\client\static\custom\%%j) do (
-      echo %%k>>"%TEMP%\ExcludeList-superseded-exclude-seconly.txt"
-    )
-  )
 )
 for %%i in ("%TEMP%\ExcludeList-superseded-exclude.txt") do if %%~zi==0 del %%i
 for %%i in ("%TEMP%\ExcludeList-superseded-exclude-seconly.txt") do if %%~zi==0 del %%i
