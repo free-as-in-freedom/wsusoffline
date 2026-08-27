@@ -1,2 +1,4 @@
 deploy-local.cmd
 static/custom/StaticDownloadLinks-w100-x64-glb.txt
+log/DownloadReport.txt
+log/DownloadReport.json
