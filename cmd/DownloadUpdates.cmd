@@ -158,8 +158,8 @@ if /i "%PROCESSOR_ARCHITECTURE%"=="AMD64" (set HASHDEEP_EXE=hashdeep64.exe) else
   if /i "%PROCESSOR_ARCHITEW6432%"=="AMD64" (set HASHDEEP_EXE=hashdeep64.exe) else (set HASHDEEP_EXE=hashdeep.exe)
 )
 
-rem ** disable SDD, if local version != most recent version ***
-if "%http_proxy%" NEQ "" (call CheckOUVersion.cmd /mode:different /quiet /proxy %http_proxy%) else (call CheckOUVersion.cmd /mode:different /quiet)
+rem ** disable SDD, if local version is older than most recent version ***
+if "%http_proxy%" NEQ "" (call CheckOUVersion.cmd /mode:newer /quiet /proxy %http_proxy%) else (call CheckOUVersion.cmd /mode:newer /quiet)
 if not "%errorlevel%"=="0" (
   set SKIP_SDD=1
   call :Log "Info: Disabled static and exclude definitions update due to version mismatch"
@@ -2480,12 +2480,10 @@ rem *** Remind build date ***
 echo Reminding build date...
 echo %DATE:~-11%>..\client\builddate.txt
 echo Reminding catalog date...
-for /F "tokens=4*" %%i in ('%SIGCHK_PATH% /accepteula -q -nobanner ..\client\wsus\wsusscn2.cab ^| %SystemRoot%\System32\findstr.exe /I "Signing"') do (
-  if "%%j"=="" (
-    echo %%i>..\client\catalogdate.txt
-  ) else (
-    echo %%j>..\client\catalogdate.txt
-  )
+for /F "skip=1 tokens=1,2,3 delims=," %%i in ('%SIGCHK_PATH% /accepteula -q -c -nobanner ..\client\wsus\wsusscn2.cab') do (
+  set "CatDate=%%k"
+  set "CatDate=!CatDate:"=!"
+  echo !CatDate!>..\client\catalogdate.txt
 )
 rem *** Create autorun.inf file ***
 echo Creating autorun.inf file...
@@ -2608,6 +2606,8 @@ if "%EXIT_ERR%"=="1" (
 
 :EoF
 
+call :Log "Info: Ending WSUS Offline Update - Community Edition - download for %1 %2"
+
 rem *** Execute custom finalization hook ***
 if exist .\custom\FinalizationHook.cmd (
   echo Executing custom finalization hook...
@@ -2617,6 +2617,5 @@ if exist .\custom\FinalizationHook.cmd (
   call :Log "Info: Executed custom finalization hook (Errorlevel: %errorlevel%)"
 )
 echo Done.
-call :Log "Info: Ending WSUS Offline Update - Community Edition - download for %1 %2"
 title %ComSpec%
 endlocal

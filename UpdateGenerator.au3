@@ -26,11 +26,11 @@ Dim Const $win10_vmax                   = 2
 Dim Const $win10_versions               = "17763,20348"
 Dim Const $win10_displayversions        = ","
 Dim Const $win10_displayversions_x64    = "Server 2019,Server 2022"
-Dim Const $win10_defaults               = "Enabled,Enabled"
+Dim Const $win10_defaults               = "Disabled,Disabled"
 Dim Const $win11_vmax                   = 5
 Dim Const $win11_versions               = "22000,22621,22631,26100,26200"
 Dim Const $win11_displayversions        = "21H2,22H2,23H2,24H2,25H2"
-Dim Const $win11_defaults               = "Enabled,Enabled,Enabled,Enabled,Enabled"
+Dim Const $win11_defaults               = "Disabled,Disabled,Disabled,Disabled,Disabled"
 
 ; Registry constants
 Dim Const $reg_key_hkcu_desktop         = "HKEY_CURRENT_USER\Control Panel\Desktop"
@@ -227,7 +227,7 @@ Func LanguageCaption($token, $german)
       EndIf
     Case $lang_token_fra
       If $german Then
-        Return "Französisch"
+        Return "Franzï¿½sisch"
       Else
         Return "French"
       EndIf
@@ -275,7 +275,7 @@ Func LanguageCaption($token, $german)
       EndIf
     Case $lang_token_nld
       If $german Then
-        Return "Niederländisch"
+        Return "Niederlï¿½ndisch"
       Else
         Return "Dutch"
       EndIf
@@ -323,7 +323,7 @@ Func LanguageCaption($token, $german)
       EndIf
     Case $lang_token_trk
       If $german Then
-        Return "Türkisch"
+        Return "Tï¿½rkisch"
       Else
         Return "Turkish"
       EndIf
@@ -341,13 +341,13 @@ Func LanguageCaption($token, $german)
       EndIf
     Case $lang_token_heb
       If $german Then
-        Return "Hebräisch"
+        Return "Hebrï¿½isch"
       Else
         Return "Hebrew"
       EndIf
     Case $lang_token_dan
       If $german Then
-        Return "Dänisch"
+        Return "Dï¿½nisch"
       Else
         Return "Danish"
       EndIf
@@ -592,7 +592,7 @@ Dim $result
   EndIf
   If @error <> 0 Then
     If $gergui Then
-      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONWARNING, $MB_OK), "Warnung", "Die Versionsprüfung (CheckOUVersion.cmd) konnte nicht ausgeführt werden.")
+      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONWARNING, $MB_OK), "Warnung", "Die Versionsprï¿½fung (CheckOUVersion.cmd) konnte nicht ausgefï¿½hrt werden.")
     Else
       MsgBox(BitOr($MB_TASKMODAL, $MB_ICONWARNING, $MB_OK), "Warning", "The version check (CheckOUVersion.cmd) could not be executed.")
     EndIf
@@ -600,8 +600,8 @@ Dim $result
   EndIf
   If $result = 1 Then
     If $gergui Then
-      $result = MsgBox(BitOr($MB_TASKMODAL, $MB_ICONQUESTION, $MB_YESNOCANCEL), "Versionsprüfung", "Sie setzen " & $caption & " ein. Eine neuere Version ist verfügbar." _
-                       & @LF & "Möchten Sie WSUS Offline Update nun aktualisieren?")
+      $result = MsgBox(BitOr($MB_TASKMODAL, $MB_ICONQUESTION, $MB_YESNOCANCEL), "Versionsprï¿½fung", "Sie setzen " & $caption & " ein. Eine neuere Version ist verfï¿½gbar." _
+                       & @LF & "Mï¿½chten Sie WSUS Offline Update nun aktualisieren?")
     Else
       $result = MsgBox(BitOr($MB_TASKMODAL, $MB_ICONQUESTION, $MB_YESNOCANCEL), "Version check", "You are using " & $caption & ". A newer version is available." _
                        & @LF & "Would you like to update WSUS Offline Update now?")
@@ -639,7 +639,7 @@ Dim $result
     EndIf
     If $result = -1 Then
       If $gergui Then
-        MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim Öffnen der Datei " & @ScriptDir & "\cmd\custom\" & $runAllFile)
+        MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim ï¿½ffnen der Datei " & @ScriptDir & "\cmd\custom\" & $runAllFile)
       Else
         MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Error", "Error opening file " & @ScriptDir & "\cmd\custom\" & $runAllFile)
       EndIf
@@ -654,7 +654,7 @@ Dim $result
   EndIf
 
   If $gergui Then
-    WinSetTitle($maindlg, $maindlg, $caption & " - Lade Updates für " & $stroptions & "...")
+    WinSetTitle($maindlg, $maindlg, $caption & " - Lade Updates fï¿½r " & $stroptions & "...")
   Else
     WinSetTitle($maindlg, $maindlg, $caption & " - Downloading updates for " & $stroptions & "...")
   EndIf
@@ -677,8 +677,8 @@ Dim $result
   Else
     WinSetState($maindlg, $maindlg, @SW_RESTORE)
     If $gergui Then
-      If MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_YESNO), "Fehler", "Fehler beim Herunterladen / Verifizieren der Updates für " & $stroptions & "." _
-                & @LF & "Möchten Sie nun die Protokolldatei ansehen?") = $msgbox_btn_yes Then
+      If MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_YESNO), "Fehler", "Fehler beim Herunterladen / Verifizieren der Updates fï¿½r " & $stroptions & "." _
+                & @LF & "Mï¿½chten Sie nun die Protokolldatei ansehen?") = $msgbox_btn_yes Then
         ShowLogFile()
       EndIf
     Else
@@ -704,7 +704,7 @@ Dim $result
     EndIf
     If $result = -1 Then
       If $gergui Then
-        MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim Öffnen der Datei " & @ScriptDir & "\cmd\custom\" & $runAllFile)
+        MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim ï¿½ffnen der Datei " & @ScriptDir & "\cmd\custom\" & $runAllFile)
       Else
         MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Error", "Error opening file " & @ScriptDir & "\cmd\custom\" & $runAllFile)
       EndIf
@@ -719,7 +719,7 @@ Dim $result
   EndIf
 
   If $gergui Then
-    WinSetTitle($maindlg, $maindlg, $caption & " - Erstelle ISO-Image für " & $stroptions & "...")
+    WinSetTitle($maindlg, $maindlg, $caption & " - Erstelle ISO-Image fï¿½r " & $stroptions & "...")
   Else
     WinSetTitle($maindlg, $maindlg, $caption & " - Creating ISO image for " & $stroptions & "...")
   EndIf
@@ -737,7 +737,7 @@ Dim $result
   Else
     WinSetState($maindlg, $maindlg, @SW_RESTORE)
     If $gergui Then
-      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim Erstellen des ISO-Images für " & $stroptions & ".")
+      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim Erstellen des ISO-Images fï¿½r " & $stroptions & ".")
     Else
       MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Error", "Error creating ISO image for " & $stroptions & ".")
     EndIf
@@ -758,7 +758,7 @@ Dim $result
     EndIf
     If $result = -1 Then
       If $gergui Then
-        MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim Öffnen der Datei " & @ScriptDir & "\cmd\custom\" & $runAllFile)
+        MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim ï¿½ffnen der Datei " & @ScriptDir & "\cmd\custom\" & $runAllFile)
       Else
         MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Error", "Error opening file " & @ScriptDir & "\cmd\custom\" & $runAllFile)
       EndIf
@@ -782,7 +782,7 @@ Dim $result
     Return $result
   EndIf
   If $gergui Then
-    WinSetTitle($maindlg, $maindlg, $caption & " - Kopiere Dateien für " & $stroptions & "...")
+    WinSetTitle($maindlg, $maindlg, $caption & " - Kopiere Dateien fï¿½r " & $stroptions & "...")
   Else
     WinSetTitle($maindlg, $maindlg, $caption & " - Copying files for " & $stroptions & "...")
   EndIf
@@ -800,7 +800,7 @@ Dim $result
   Else
     WinSetState($maindlg, $maindlg, @SW_RESTORE)
     If $gergui Then
-      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim Kopieren der Dateien für " & $stroptions & ".")
+      MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Fehler beim Kopieren der Dateien fï¿½r " & $stroptions & ".")
     Else
       MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Error", "Error copying files for " & $stroptions & ".")
     EndIf
@@ -920,7 +920,7 @@ $win10_ver_inifilename = StringLeft(@ScriptFullPath, StringInStr(@ScriptFullPath
 $txtxpos = $txtxoffset
 $txtypos = $txtyoffset
 If $gergui Then
-  GUICtrlCreateLabel("Lade Microsoft-Updates für...", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
+  GUICtrlCreateLabel("Lade Microsoft-Updates fï¿½r...", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 Else
   GUICtrlCreateLabel("Download Microsoft updates for...", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 EndIf
@@ -1071,7 +1071,7 @@ EndIf
 ;  Security Only Updates
 $txtxpos = $txtxpos + $groupwidth / 2
 If $gergui Then
-  $seconly = GUICtrlCreateCheckbox("'Reine Sicherheitsupdates' anstelle von 'Qualitätsrollups' verwenden", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
+  $seconly = GUICtrlCreateCheckbox("'Reine Sicherheitsupdates' anstelle von 'Qualitï¿½tsrollups' verwenden", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 Else
   $seconly = GUICtrlCreateCheckbox("Use 'security only updates' instead of 'quality rollups'", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 EndIf
@@ -1088,12 +1088,12 @@ EndIf
 $txtxpos = 2 * $txtxoffset
 $txtypos = $txtypos + $txtheight
 If $gergui Then
-  $dotnet = GUICtrlCreateCheckbox("C++-Laufzeitbibliotheken und .NET Frameworks einschließen", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
+  $dotnet = GUICtrlCreateCheckbox("C++-Laufzeitbibliotheken und .NET Frameworks einschlieï¿½en", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 Else
   $dotnet = GUICtrlCreateCheckbox("Include C++ Runtime Libraries and .NET Frameworks", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 EndIf
 If IniRead($inifilename, $ini_section_opts, $opts_token_allowdotnet, $enabled) = $enabled Then
-  If IniRead($inifilename, $ini_section_opts, $opts_token_includedotnet, $enabled) = $enabled Then
+  If IniRead($inifilename, $ini_section_opts, $opts_token_includedotnet, $disabled) = $enabled Then
     GUICtrlSetState(-1, $GUI_CHECKED)
   Else
     GUICtrlSetState(-1, $GUI_UNCHECKED)
@@ -1105,7 +1105,7 @@ EndIf
 ;  Include Windows Defender definitions
 $txtxpos = $txtxpos + $groupwidth / 2
 If $gergui Then
-  $wddefs = GUICtrlCreateCheckbox("Windows Defender-Definitionen einschließen", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
+  $wddefs = GUICtrlCreateCheckbox("Windows Defender-Definitionen einschlieï¿½en", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 Else
   $wddefs = GUICtrlCreateCheckbox("Include Windows Defender definitions", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 EndIf
@@ -1158,7 +1158,7 @@ EndIf
 $txtypos = $txtypos + 1.5 * $txtyoffset
 $txtxpos = 2 * $txtxoffset
 If $gergui Then
-  $usbcopy = GUICtrlCreateCheckbox("Kopiere Updates für gewählte Produkte ins Verzeichnis:", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
+  $usbcopy = GUICtrlCreateCheckbox("Kopiere Updates fï¿½r gewï¿½hlte Produkte ins Verzeichnis:", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 Else
   $usbcopy = GUICtrlCreateCheckbox("Copy updates for selected products into directory:", $txtxpos, $txtypos, $groupwidth / 2, $txtheight)
 EndIf
@@ -1210,7 +1210,7 @@ GUICtrlSetResizing(-1, $GUI_DOCKLEFT + $GUI_DOCKBOTTOM)
 ;  Image only checkbox
 $txtxpos = $txtxpos + $btnwidth + $txtxoffset
 If $gergui Then
-  $imageonly = GUICtrlCreateCheckbox("Nur ISO / USB präparieren", $txtxpos, $txtypos, 2 * $txtwidth, $slimheight)
+  $imageonly = GUICtrlCreateCheckbox("Nur ISO / USB prï¿½parieren", $txtxpos, $txtypos, 2 * $txtwidth, $slimheight)
 Else
   $imageonly = GUICtrlCreateCheckbox("Only prepare ISO / USB", $txtxpos, $txtypos, 2 * $txtwidth, $slimheight)
 EndIf
@@ -1303,7 +1303,7 @@ If NOT PathValid(@TempDir) Then
 EndIf
 If StringRight(EnvGet("TEMP"), 1) = "\" Then
   If $gergui Then
-    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Der %TEMP%-Pfad enthält einen abschließenden Backslash ('\').")
+    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Der %TEMP%-Pfad enthï¿½lt einen abschlieï¿½enden Backslash ('\').")
   Else
     MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Error", "The %TEMP% path contains a trailing backslash ('\').")
   EndIf
@@ -1311,7 +1311,7 @@ If StringRight(EnvGet("TEMP"), 1) = "\" Then
 EndIf
 If NOT DirectoryStructureExists() Then
   If $gergui Then
-    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Die Verzeichnisstruktur ist unvollständig." _
+    MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Fehler", "Die Verzeichnisstruktur ist unvollstï¿½ndig." _
                      & @LF & "Bitte behalten Sie diese beim Entpacken des Zip-Archivs bei.")
   Else
     MsgBox(BitOr($MB_TASKMODAL, $MB_ICONERROR, $MB_OK), "Error", "The directory structure is incomplete." _
@@ -1364,7 +1364,7 @@ While 1
 
     Case $usbfsf            ; FSF button pressed
       If $gergui Then
-        $dummy = FileSelectFolder("Wählen Sie das Zielverzeichnis:", "", 1, GUICtrlRead($usbpath))
+        $dummy = FileSelectFolder("Wï¿½hlen Sie das Zielverzeichnis:", "", 1, GUICtrlRead($usbpath))
       Else
         $dummy = FileSelectFolder("Choose target directory:", "", 1, GUICtrlRead($usbpath))
       EndIf
@@ -1376,8 +1376,8 @@ While 1
       If IsCheckBoxChecked($usbclean) Then
         If $gergui Then
           If MsgBox(BitOr($MB_TASKMODAL, $MB_DEFBUTTON2, $MB_ICONEXCLAMATION, $MB_YESNO), "Warnung", "Durch die Option 'Zielverzeichnis bereinigen'" _
-                               & @LF & "werden dort bereits existierende Dateien gelöscht." _
-                               & @LF & "Möchten Sie fortsetzen?") = $msgbox_btn_no Then
+                               & @LF & "werden dort bereits existierende Dateien gelï¿½scht." _
+                               & @LF & "Mï¿½chten Sie fortsetzen?") = $msgbox_btn_no Then
             GUICtrlSetState($usbclean, $GUI_UNCHECKED)
           EndIf
         Else
@@ -1393,8 +1393,8 @@ While 1
       If IsCheckBoxChecked($imageonly) Then
         If $gergui Then
           If MsgBox(BitOr($MB_TASKMODAL, $MB_DEFBUTTON2, $MB_ICONEXCLAMATION, $MB_YESNO), "Warnung", "Durch diese Option verhindern Sie das Herunterladen aktueller Updates." _
-                               & @LF & "Dies kann ein erhöhtes Sicherheitsrisiko für das Zielsystem bedeuten." _
-                               & @LF & "Möchten Sie fortsetzen?") = $msgbox_btn_no Then
+                               & @LF & "Dies kann ein erhï¿½htes Sicherheitsrisiko fï¿½r das Zielsystem bedeuten." _
+                               & @LF & "Mï¿½chten Sie fortsetzen?") = $msgbox_btn_no Then
             GUICtrlSetState($imageonly, $GUI_UNCHECKED)
           Else
             GUICtrlSetState($verifydownloads, $GUI_DISABLE)
@@ -1423,7 +1423,7 @@ While 1
     Case $btn_proxy         ; Proxy button pressed
       If $gergui Then
         $dummy = InputBox("HTTP-Proxy-Einstellung", _
-                          "ACHTUNG: Sonderzeichen müssen hier gemäß RFC1738 codiert werden." & @LF _
+                          "ACHTUNG: Sonderzeichen mï¿½ssen hier gemï¿½ï¿½ RFC1738 codiert werden." & @LF _
                         & "Um die Speicherung Ihres Passworts zu vermeiden," & @LF _
                         & "lassen Sie es hier bitte weg (http://Benutzername:@Server[:Port])." & @LF & @LF _
                         & "Bitte geben Sie Ihre HTTP-Proxy-URL ein" & @LF _
@@ -1515,7 +1515,7 @@ While 1
         If IsCheckBoxChecked($scripting) Then
           If $gergui Then
             If MsgBox(BitOr($MB_TASKMODAL, $MB_ICONINFORMATION, $MB_YESNO), "Info", "Sammelskript " & @ScriptDir & "\cmd\custom\RunAll.cmd erstellt." _
-                      & @LF & "Möchten Sie das Skript nun prüfen?") = $msgbox_btn_yes Then
+                      & @LF & "Mï¿½chten Sie das Skript nun prï¿½fen?") = $msgbox_btn_yes Then
               ShowRunAll()
             EndIf
           Else
@@ -1538,7 +1538,7 @@ While 1
           Else
             If $gergui Then
               If MsgBox(BitOr($MB_TASKMODAL, $MB_ICONINFORMATION, $MB_YESNO), "Info", "Herunterladen / Image-Erstellung / Kopieren erfolgreich." _
-                        & @LF & "Möchten Sie nun die Protokolldatei auf mögliche Warnungen prüfen?") = $msgbox_btn_yes Then
+                        & @LF & "Mï¿½chten Sie nun die Protokolldatei auf mï¿½gliche Warnungen prï¿½fen?") = $msgbox_btn_yes Then
                 ShowLogFile()
               EndIf
             Else
