@@ -1,0 +1,24 @@
+# Machine list for Invoke-RemoteUpdate.ps1 -TargetFile and for
+# Show-RemoteUpdateGui.ps1.
+#
+# One target per line, as a host name, a fully qualified name or an IP address.
+# Blank lines are ignored, and so is everything on a line that starts with #,
+# which is how a machine is taken out of the list temporarily.
+#
+# The name of this machine is ignored if it appears here: use -IncludeLocalHost
+# to patch the machine you are starting from, because that runs in place from
+# this repository instead of copying the payload over the admin share.
+#
+# Copy this file to remote-targets.txt and edit it. That name is in .gitignore,
+# so a site's real machine list is never committed. Both the GUI and the command
+# line read the same file, and the GUI's "Add..." button appends to it.
+#
+# Each target needs file and printer sharing (TCP 445) so the payload can be
+# copied to its admin share, and the scheduled task interface, so that the
+# installation can run there as SYSTEM. Both are the default in a domain.
+
+SRV01
+SRV02.example.local
+10.0.0.42
+
+# WS-07        was switched off during the last run
