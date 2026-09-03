@@ -158,7 +158,7 @@ if ($ScanOnly -and -not (Test-Path -LiteralPath (Join-Path $clientDir 'wsus\wsus
 if ($StagingRoot -match '\s') {
     throw "-StagingRoot must not contain spaces (got '$StagingRoot')."
 }
-if (-not ($StagingRoot -match '^[A-Za-z]:\')) {
+if (-not ($StagingRoot -match '^[A-Za-z]:\\')) {
     throw "-StagingRoot must be a local absolute path on the target, e.g. C:\temp (got '$StagingRoot')."
 }
 

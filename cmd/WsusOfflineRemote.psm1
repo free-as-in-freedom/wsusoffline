@@ -365,9 +365,10 @@ function Test-WouTarget {
     $mapped = $false
     try {
         if ($null -ne $Credential) {
-            $null = & net.exe use "\\$ComputerName\$share" /user:$($Credential.UserName) `
-                        $($Credential.GetNetworkCredential().Password) 2>&1
-            if ($LASTEXITCODE -eq 0) { $mapped = $true }
+            $net = Invoke-WouNetUse @('use', "\\$ComputerName\$share",
+                                      "/user:$($Credential.UserName)",
+                                      $Credential.GetNetworkCredential().Password)
+            if ($net.Code -eq 0) { $mapped = $true }
         }
 
         $probe = Test-WouAdminShare "\\$ComputerName\$share"
@@ -411,20 +412,25 @@ function Test-WouTarget {
             return $info
         }
 
-        try {
-            $cimCommon = @{ ComputerName = $ComputerName; ErrorAction = 'Stop' }
-            if ($null -ne $Credential) { $cimCommon.Credential = $Credential }
+        $cim = New-WouCimSession -ComputerName $ComputerName -Credential $Credential
+        if ($null -eq $cim) {
+            $info.Note = "Connected, but WMI is unavailable, so free space and OS could not be read."
+        } else {
+            try {
+                $disk = Get-CimInstance -CimSession $cim -ClassName Win32_LogicalDisk `
+                            -Filter "DeviceID='$qualifier'" -ErrorAction Stop
+                if ($disk) { $info.FreeGB = [Math]::Round($disk.FreeSpace / 1GB, 1) }
 
-            $disk = Get-CimInstance @cimCommon -ClassName Win32_LogicalDisk -Filter "DeviceID='$qualifier'"
-            if ($disk) { $info.FreeGB = [Math]::Round($disk.FreeSpace / 1GB, 1) }
-
-            $os = Get-CimInstance @cimCommon -ClassName Win32_OperatingSystem
-            if ($os) {
-                $info.OsCaption      = ($os.Caption -replace '^Microsoft\s+', '').Trim()
-                $info.LastBootUpTime = $os.LastBootUpTime
+                $os = Get-CimInstance -CimSession $cim -ClassName Win32_OperatingSystem -ErrorAction Stop
+                if ($os) {
+                    $info.OsCaption      = ($os.Caption -replace '^Microsoft\s+', '').Trim()
+                    $info.LastBootUpTime = $os.LastBootUpTime
+                }
+            } catch {
+                $info.Note = "Connected, but WMI is unavailable: $($_.Exception.Message)"
+            } finally {
+                Remove-CimSession -CimSession $cim -ErrorAction SilentlyContinue
             }
-        } catch {
-            $info.Note = "Connected, but WMI is unavailable: $($_.Exception.Message)"
         }
 
         # Two operators, or an earlier run, may still be working here. This sits
@@ -456,7 +462,7 @@ function Test-WouTarget {
     } catch {
         $info.Note = $_.Exception.Message
     } finally {
-        try { if ($mapped) { $null = & net.exe use "\\$ComputerName\$share" /delete /y 2>&1 } } catch { }
+        try { if ($mapped) { $null = Invoke-WouNetUse @('use', "\\$ComputerName\$share", '/delete', '/y') } } catch { }
     }
 
     return $info
@@ -631,6 +637,73 @@ function Invoke-WouSchTasks {
     }
 }
 
+function New-WouCimSession {
+    # Private. Opens a CIM session for the advisory readings (free space, OS
+    # caption, last boot). Returns $null rather than throwing: every caller
+    # treats these as nice-to-have, and a host that will not answer WMI is
+    # still perfectly deployable.
+    #
+    # This exists because Get-CimInstance has no -Credential parameter. Passing
+    # one in a splat is a parameter-binding failure, so the readings were never
+    # available on exactly the hosts that need credentials - the workgroup
+    # targets. Credentials reach CIM only through New-CimSession.
+    #
+    # DCOM first, because that is what the tooling promises: the targets are
+    # configured for SMB and remote RPC, and nothing else in this module needs
+    # WinRM. Get-CimInstance -ComputerName would have used WS-Management, which
+    # silently added a WinRM requirement the documentation explicitly disclaims.
+    # WS-Management is still tried second, for a host hardened the other way
+    # round - DCOM shut off, WinRM open.
+    param([string] $ComputerName, $Credential)
+
+    foreach ($protocol in 'Dcom', 'Wsman') {
+        try {
+            $args = @{ ComputerName  = $ComputerName
+                       SessionOption = (New-CimSessionOption -Protocol $protocol)
+                       ErrorAction   = 'Stop' }
+            if ($null -ne $Credential) { $args.Credential = $Credential }
+            return New-CimSession @args
+        } catch {
+            continue
+        }
+    }
+    return $null
+}
+
+function Invoke-WouNetUse {
+    # Private. The same contract as Invoke-WouSchTasks, for net.exe: run it,
+    # hand back the exit code and the text, never throw.
+    #
+    # net.exe reports "System error 67 has occurred." and its siblings on
+    # stderr, so capturing them with 2>&1 walks into the same PowerShell 5.1
+    # trap documented above. Here it was worse than a stray throw: in
+    # Test-WouTarget the terminating error skipped the admin-share probe and
+    # the error-to-remedy switch with it, so every unreachable host - which is
+    # exactly when the operator needs the remedy - came back with
+    # AdminShareError 0 and a bare net.exe string in Note. In Invoke-HostRun it
+    # made the AuthFailed branch unreachable, because $LASTEXITCODE was never
+    # consulted.
+    param([string[]] $Arguments)
+
+    $ErrorActionPreference = 'Continue'
+    $raw  = & net.exe @Arguments 2>&1
+    $code = $LASTEXITCODE
+
+    $lines = foreach ($item in $raw) {
+        $line = if ($item -is [System.Management.Automation.ErrorRecord]) {
+            $item.Exception.Message
+        } else {
+            [string] $item
+        }
+        if ($line -and $line.Trim()) { $line.Trim() }
+    }
+
+    return [pscustomobject]@{
+        Code   = $code
+        Output = (@($lines) -join [Environment]::NewLine)
+    }
+}
+
 function Invoke-HostRun {
     <#
     .SYNOPSIS
@@ -749,11 +822,12 @@ function Invoke-HostRun {
         try {
             # -- authenticate --------------------------------------------------
             if ($null -ne $Credential) {
-                $netOut = & net.exe use "\\$TargetHost\$share" /user:$($Credential.UserName) `
-                              $($Credential.GetNetworkCredential().Password) 2>&1
-                if ($LASTEXITCODE -ne 0) {
+                $net = Invoke-WouNetUse @('use', "\\$TargetHost\$share",
+                                          "/user:$($Credential.UserName)",
+                                          $Credential.GetNetworkCredential().Password)
+                if ($net.Code -ne 0) {
                     $result.Status = 'AuthFailed'
-                    $result.Detail = ($netOut -join ' ').Trim()
+                    $result.Detail = $net.Output
                     break
                 }
                 $mapped = $true
@@ -778,11 +852,14 @@ function Invoke-HostRun {
             # Advisory only: WMI/DCOM is often blocked even where SMB works, and
             # a missing free-space reading is not a reason to skip a host.
             try {
-                $cimArgs = @{ ComputerName = $TargetHost
-                              ClassName    = 'Win32_LogicalDisk'
-                              Filter       = "DeviceID='$qualifier'" }
-                if ($null -ne $Credential) { $cimArgs.Credential = $Credential }
-                $disk = Get-CimInstance @cimArgs -ErrorAction Stop
+                $cim = New-WouCimSession -ComputerName $TargetHost -Credential $Credential
+                if ($null -eq $cim) { throw 'no CIM session' }
+                try {
+                    $disk = Get-CimInstance -CimSession $cim -ClassName Win32_LogicalDisk `
+                                -Filter "DeviceID='$qualifier'" -ErrorAction Stop
+                } finally {
+                    Remove-CimSession -CimSession $cim -ErrorAction SilentlyContinue
+                }
                 if ($disk -and $disk.FreeSpace -gt 0 -and $disk.FreeSpace -lt ($PayloadBytes * 1.1)) {
                     $result.Status = 'InsufficientSpace'
                     $result.Detail = ('Needs about {0:N1} GB on {1}, only {2:N1} GB free.' -f
@@ -1007,7 +1084,7 @@ function Invoke-HostRun {
             }
 
             try {
-                if ($mapped) { $null = & net.exe use "\\$TargetHost\$share" /delete /y 2>&1 }
+                if ($mapped) { $null = Invoke-WouNetUse @('use', "\\$TargetHost\$share", '/delete', '/y') }
             } catch { }
         }
     } while ($false)
@@ -1077,8 +1154,8 @@ function Remove-WouStaging {
     $mapped = $false
     try {
         if ($null -ne $Credential) {
-            $null = & net.exe use $uncShare /user:$($Credential.UserName) $plain 2>&1
-            if ($LASTEXITCODE -eq 0) { $mapped = $true }
+            $net = Invoke-WouNetUse @('use', $uncShare, "/user:$($Credential.UserName)", $plain)
+            if ($net.Code -eq 0) { $mapped = $true }
         }
 
         if (-not (Test-Path -LiteralPath $uncShare)) {
@@ -1114,7 +1191,7 @@ function Remove-WouStaging {
         $result.Status = 'Failed'
         $result.Detail = $_.Exception.Message
     } finally {
-        try { if ($mapped) { $null = & net.exe use $uncShare /delete /y 2>&1 } } catch { }
+        try { if ($mapped) { $null = Invoke-WouNetUse @('use', $uncShare, '/delete', '/y') } } catch { }
     }
 
     return $result
