@@ -1,0 +1,4 @@
+# Batch files are executed by cmd.exe, which mis-parses LF-only files:
+# goto cannot find labels, blocks are silently skipped, and control flow
+# falls through. Keep them CRLF on checkout regardless of the platform.
+*.cmd text eol=crlf

@@ -670,6 +670,22 @@ function New-WouCimSession {
     return $null
 }
 
+function Read-WouResultFile {
+    # Private. Returns the exit code the wrapper wrote, or $null when the file
+    # is absent, unreadable, or not yet a complete number - a read that catches
+    # the wrapper mid-write must not be mistaken for a finished run.
+    param([string] $Path)
+
+    if (-not (Test-Path -LiteralPath $Path)) { return $null }
+    try {
+        $raw = (Get-Content -LiteralPath $Path -Raw -ErrorAction Stop).Trim()
+    } catch {
+        return $null
+    }
+    if ($raw -match '^-?\d+$') { return [int] $raw }
+    return $null
+}
+
 function Invoke-WouNetUse {
     # Private. The same contract as Invoke-WouSchTasks, for net.exe: run it,
     # hand back the exit code and the text, never throw.
@@ -959,18 +975,30 @@ function Invoke-HostRun {
             # gone. Requiring three consecutive Ready readings avoids mistaking
             # the former for the latter.
             $readyStrikes = 0
+            # A query we could not complete says nothing about the task, so it
+            # must not count as "the task has gone". The target is busiest
+            # exactly while a feature upgrade is under way, which is when the
+            # RPC query is most likely to fail - counting those as strikes
+            # abandoned runs that were still going. Tracked separately so a
+            # target whose task interface has genuinely died still gives up
+            # rather than waiting out the whole timeout.
+            $queryFails = 0
 
             while ((Get-Date) -lt $deadline) {
                 Start-Sleep -Seconds $PollSeconds
 
-                if (Test-Path -LiteralPath $resultFile) {
-                    $raw = (Get-Content -LiteralPath $resultFile -Raw).Trim()
-                    if ($raw -match '^-?\d+$') { $exitCode = [int]$raw; break }
-                }
+                $exitCode = Read-WouResultFile $resultFile
+                if ($null -ne $exitCode) { break }
 
                 $state = Invoke-WouSchTasks (@('/S', $TargetHost) + $credArgs +
                                              @('/Query', '/TN', $taskName, '/FO', 'CSV', '/NH'))
-                if ($state.Code -ne 0 -or $state.Output -notmatch 'Running') {
+                if ($state.Code -ne 0) {
+                    $queryFails++
+                    if ($queryFails -ge 20) { break }
+                    continue
+                }
+                $queryFails = 0
+                if ($state.Output -notmatch 'Running') {
                     $readyStrikes++
                     if ($readyStrikes -ge 3) { break }
                 } else {
@@ -978,10 +1006,18 @@ function Invoke-HostRun {
                 }
             }
 
-            # One last look: the task may have finished during the final sleep.
-            if ($null -eq $exitCode -and (Test-Path -LiteralPath $resultFile)) {
-                $raw = (Get-Content -LiteralPath $resultFile -Raw).Trim()
-                if ($raw -match '^-?\d+$') { $exitCode = [int]$raw }
+            # The wrapper writes the result file immediately before it exits, so
+            # the task can read as finished a moment before the file is visible
+            # here - and an SMB client caches directory metadata for a few
+            # seconds on top of that. A single look lost a completed 24-minute
+            # install to a one-second race, so look again for half a minute
+            # before concluding there is no result.
+            if ($null -eq $exitCode) {
+                foreach ($attempt in 1..6) {
+                    Start-Sleep -Seconds 5
+                    $exitCode = Read-WouResultFile $resultFile
+                    if ($null -ne $exitCode) { break }
+                }
             }
 
             $result.ExitCode = $exitCode
