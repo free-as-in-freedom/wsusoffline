@@ -29,3 +29,6 @@ ExtractDownloadLinks-all.cmd
 ExtractSupersededUpdates.cmd
 PrepareReleaseTree.cmd
 MakeRelease.cmd
+remote-targets.txt
+MakeReleaseUnzipped.cmd
+deploy-local.cmd

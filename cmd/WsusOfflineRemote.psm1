@@ -266,8 +266,15 @@ function Get-ExitCodeDetail {
         }
     }
 
-    if ([int]$ExitCode -notin 0, 3010, 3011) { return "DoUpdate.cmd exited $ExitCode." }
-    return $null
+    # 3010 and 3011 are successes that are not finished, and they are the two
+    # codes an operator has to act on, so they say what the action is rather
+    # than leaving the status name to carry it alone.
+    switch ([int]$ExitCode) {
+        0       { return $null }
+        3010    { return 'A restart is pending. Reboot the target, then run this again to install what is left.' }
+        3011    { return 'Updates installed, more are pending. Reboot the target, then run this again.' }
+        default { return "DoUpdate.cmd exited $ExitCode." }
+    }
 }
 
 function Test-WouAdminShare {
