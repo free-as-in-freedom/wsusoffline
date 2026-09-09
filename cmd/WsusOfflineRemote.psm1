@@ -845,6 +845,16 @@ function Invoke-HostRun {
         try {
             # -- authenticate --------------------------------------------------
             if ($null -ne $Credential) {
+                # Windows allows one identity per server at a time, so a session
+                # this host already holds - Test-WouTarget's own, an implicit one
+                # opened as the interactive user, or a run that ended badly -
+                # makes the logon below fail with error 1219 rather than being
+                # replaced. Preflight then scan is the workflow the GUI's buttons
+                # encourage and the sequence that trips it, so drop whatever is
+                # there first. A delete with nothing to delete is a non-zero exit
+                # and nothing else, which is why the result is discarded.
+                $null = Invoke-WouNetUse @('use', "\\$TargetHost\$share", '/delete', '/y')
+
                 $net = Invoke-WouNetUse @('use', "\\$TargetHost\$share",
                                           "/user:$($Credential.UserName)",
                                           $Credential.GetNetworkCredential().Password)
